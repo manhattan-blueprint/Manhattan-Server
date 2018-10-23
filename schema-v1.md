@@ -10,6 +10,7 @@ All requests, aside from Authentication, must contain the access token as a head
 **Description**: Validate an existing user and get access tokens 
 
 **Request Contents**:
+
 Parameter | Type | Description
 ---|---|---
 username | String | The username
@@ -35,6 +36,7 @@ Code 401:
 **Description**: Fetch a new access token once expired
 
 **Request Contents**:
+
 Parameter | Type | Description
 ---|---|---
 refresh_token | String | The previous refresh token
@@ -72,7 +74,7 @@ Code 200:
 Code 401:
 ```json
 {
-    "error": "Unauthorized auth token is invalid".
+    "error": "Unauthorized auth token is invalid"
 }
 ```
 
@@ -81,6 +83,7 @@ Code 401:
 **Description**: Add item to inventory
 
 **Request Contents**:
+
 Parameter | Type | Description
 ---|---|---
 item_id | Int | The item collected
