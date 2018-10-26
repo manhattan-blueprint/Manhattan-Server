@@ -14,7 +14,7 @@ All requests, aside from Authentication, must contain the access token as a head
 Parameter | Type | Description
 ---|---|---
 username | String | The username
-password | String | Password (encrypted??)
+password | String | Password (encrypted???)
 
 **Response**: <br>
 Code 200:
