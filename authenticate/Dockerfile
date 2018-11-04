@@ -10,4 +10,4 @@ RUN apk add --no-cache git &&\
 
 ENTRYPOINT ./authenticate
 
-EXPOSE 80
+EXPOSE 8000
