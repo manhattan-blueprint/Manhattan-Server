@@ -1,0 +1,50 @@
+version: '3'
+
+services:
+  authenticate:
+    image: authenticate:latest
+    deploy:
+      replicas: 1 # instances
+      resources:
+        limits:
+          cpus: "0.1" # 10% across all cores
+          memory: 50M # 50MB RAM
+      restart_policy:
+        condition: on-failure
+    ports:
+      - "8000:8000" # port mapping
+    networks: # share port 8000 via a load-balancing network called webnet
+    - webnet
+
+  inventory:
+    image: inventory:latest
+    deploy:
+      replicas: 1
+      resources:
+        limits:
+          cpus: "0.1"
+          memory: 50M
+      restart_policy:
+        condition: on-failure
+    ports:
+      - "8001:8000"
+    networks: # share port 8001 via a load-balancing network called webnet
+      - webnet
+
+  resources:
+    image: resources:latest
+    deploy:
+      replicas: 1
+      resources:
+        limits:
+          cpus: "0.1"
+          memory: 50M
+      restart_policy:
+        condition: on-failure
+    ports:
+      - "8002:8000"
+    networks: # share port 8002 via a load-balancing network called webnet
+      - webnet
+    
+networks:
+  webnet:
