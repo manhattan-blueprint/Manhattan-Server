@@ -4,7 +4,7 @@ The server for the game Blueprint by Manhattan, using Docker.
 
 ## Deployment Instructions
 
-With docker installed, first build the image for each service using the build script, `build.sh`, since the docker-compose file assumes the images already exist. Then initialize the current node, i.e. computer, as the swarm manager:
+With Docker installed, first build the image for each service using the build script, `build.sh`, since the docker-compose file assumes the images already exist. Then initialize the current node, i.e. computer, as the swarm manager:
 
 `docker swarm init`
 
