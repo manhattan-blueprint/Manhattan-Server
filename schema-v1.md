@@ -20,8 +20,8 @@ password | String | Password (encrypted??)
 Code 200:
 ```json
 {
-    "access_token": "abcdefgh",
-    "refresh_token": "abddeefd"
+    "access": "abcdefgh",
+    "refresh": "abddeefd"
 }
 ```
 Code 401:
@@ -45,8 +45,8 @@ refresh_token | String | The previous refresh token
 Code 200:
 ```json
 {
-    "access_token": "abcdefgh",
-    "refresh_token": "abddeefd"
+    "access": "abcdefgh",
+    "refresh": "abddeefd"
 }
 ```
 Code 401:
