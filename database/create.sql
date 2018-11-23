@@ -13,10 +13,10 @@ CREATE TABLE account (
 -- TODO: Change token type when salted hash is implemented
 CREATE TABLE token (
     user_id INT UNSIGNED,
-    access  CHAR(32) NOT NULL,
-    refresh CHAR(32) NOT NULL,
-    access_expire  INT(11) UNSIGNED NOT NULL,
-    refresh_expire INT(11) UNSIGNED NOT NULL,
+    access  CHAR(64) NOT NULL,
+    refresh CHAR(64) NOT NULL,
+    access_expire  BIGINT NOT NULL,
+    refresh_expire BIGINT NOT NULL,
     FOREIGN KEY (user_id) REFERENCES account(user_id),
     PRIMARY KEY (user_id)
 );
@@ -34,6 +34,6 @@ CREATE TABLE resources (
     item_id  INT UNSIGNED NOT NULL,
     gcs_lat  DECIMAL NOT NULL,
     gcs_long DECIMAL NOT NULL,
-    resource_expire INT(11) UNSIGNED NOT NULL,
+    resource_expire BIGINT NOT NULL,
     PRIMARY KEY (spawn_id)
 );
