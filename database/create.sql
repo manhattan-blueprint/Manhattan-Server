@@ -2,7 +2,6 @@ DROP DATABASE IF EXISTS blueprint;
 CREATE DATABASE blueprint;
 USE blueprint;
 
--- TODO: Change password type when salted hash is implemented
 CREATE TABLE account (
     user_id INT UNSIGNED,
     username VARCHAR(16) NOT NULL,
@@ -10,15 +9,15 @@ CREATE TABLE account (
     PRIMARY KEY (user_id)
 );
 
--- TODO: Change token type when salted hash is implemented
 CREATE TABLE token (
+    pair_id INT UNSIGNED,
     user_id INT UNSIGNED,
     access  CHAR(64) NOT NULL,
     refresh CHAR(64) NOT NULL,
     access_expire  BIGINT NOT NULL,
     refresh_expire BIGINT NOT NULL,
     FOREIGN KEY (user_id) REFERENCES account(user_id),
-    PRIMARY KEY (user_id)
+    PRIMARY KEY (pair_id)
 );
 
 CREATE TABLE inventory (
