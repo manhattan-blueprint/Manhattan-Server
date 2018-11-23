@@ -11,7 +11,7 @@ CREATE TABLE account (
 
 CREATE TABLE token (
     pair_id INT UNSIGNED,
-    user_id INT UNSIGNED,
+    user_id INT UNSIGNED NOT NULL,
     access  CHAR(64) NOT NULL,
     refresh CHAR(64) NOT NULL,
     access_expire  BIGINT NOT NULL,
