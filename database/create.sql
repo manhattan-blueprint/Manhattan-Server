@@ -6,7 +6,7 @@ USE blueprint;
 CREATE TABLE account (
     user_id INT UNSIGNED,
     username VARCHAR(16) NOT NULL,
-    password VARCHAR(16) NOT NULL,
+    password BINARY(60) NOT NULL,
     PRIMARY KEY (user_id)
 );
 
