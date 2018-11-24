@@ -7,6 +7,7 @@ COPY . .
 RUN apk add --no-cache git &&\
     go get github.com/gorilla/mux &&\
     go get github.com/go-sql-driver/mysql &&\
+    go get golang.org/x/crypto/bcrypt &&\
     go build -o authenticate
 
 ENTRYPOINT ./authenticate

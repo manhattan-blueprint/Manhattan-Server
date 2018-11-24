@@ -5,15 +5,26 @@ import (
 )
 
 type Token struct {
-	UserID        int    `json:"user_id"`
+	PairID        uint32 `json:"paid_id"`
+	UserID        uint32 `json:"user_id"`
 	Access        string `json:"access"`
 	Refresh       string `json:"refresh"`
-	AccessExpire  int    `json:"access_expire"`
-	RefreshExpire int    `json:"refresh_expire"`
+	AccessExpire  int64  `json:"access_expire"`
+	RefreshExpire int64  `json:"refresh_expire"`
 }
 
 func (tok *Token) GetTokens(db *sql.DB) error {
 	stmt := "SELECT access, refresh FROM token WHERE user_id=?"
 	// Prepared statements implemented by sql package
 	return db.QueryRow(stmt, tok.UserID).Scan(&tok.Access, &tok.Refresh)
+}
+
+func (tok *Token) CreateToken(db *sql.DB) error {
+	stmt := "INSERT INTO token VALUES (?, ?, ?, ?, ?, ?)"
+	_, err := db.Exec(stmt, tok.PairID, tok.UserID, tok.Access, tok.Refresh,
+		tok.AccessExpire, tok.RefreshExpire)
+	if err != nil {
+		return err
+	}
+	return nil
 }

@@ -5,13 +5,28 @@ import (
 )
 
 type Account struct {
-	UserID   int    `json:"user_id"`
+	UserID   uint32 `json:"user_id"`
 	Username string `json:"username"`
-	Password string `json:"password"`
+	Password []byte `json:"password"`
+}
+
+func (acc *Account) CreateAccount(db *sql.DB) error {
+	stmt := "INSERT INTO account VALUES (?, ?, ?)"
+	_, err := db.Exec(stmt, acc.UserID, acc.Username, acc.Password)
+	if err != nil {
+		return err
+	}
+	return nil
+}
+
+func (acc *Account) GetPassword(db *sql.DB) error {
+	stmt := "SELECT password FROM account WHERE username=?"
+	// Prepared statements implemented by sql package
+	return db.QueryRow(stmt, acc.Username).Scan(&acc.Password)
 }
 
 func (acc *Account) GetID(db *sql.DB) error {
-	stmt := "SELECT user_id FROM account WHERE username=? AND password=?"
+	stmt := "SELECT user_id FROM account WHERE username=?"
 	// Prepared statements implemented by sql package
-	return db.QueryRow(stmt, acc.Username, acc.Password).Scan(&acc.UserID)
+	return db.QueryRow(stmt, acc.Username).Scan(&acc.UserID)
 }

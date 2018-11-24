@@ -6,6 +6,37 @@ All requests, aside from Authentication, must contain the access token as a head
 `Authorization: Bearer <token>`
 
 # Authentication
+`/authenticate/register` (POST) <br>
+**Description**: Create a new user and get auth tokens
+
+**Request Contents**:
+
+Parameter | Type | Description
+---|---|---
+username | String | User username
+password | String | User password (plaintext, protected by https)
+
+**Response**: <br>
+Code 200:
+```json
+{
+    "access":"abcdefgh",
+    "refresh":"ijklmnop"
+}
+```
+Code 400:
+```json
+{
+    "error":"Invalid username or password"
+}
+```
+or
+```json
+{
+    "error":"Username already exists"
+}
+```
+
 `/authenticate` (POST) <br>
 **Description**: Validate an existing user and get access tokens 
 
@@ -13,21 +44,27 @@ All requests, aside from Authentication, must contain the access token as a head
 
 Parameter | Type | Description
 ---|---|---
-username | String | The username
-password | String | Password (encrypted??)
+username | String | User username
+password | String | User password (plaintext, protected by https)
 
 **Response**: <br>
 Code 200:
 ```json
 {
-    "access": "abcdefgh",
-    "refresh": "abddeefd"
+    "access":"abcdefgh",
+    "refresh":"ijklmnop"
 }
 ```
-Code 401:
+Code 400:
 ```json
 {
-    "error": "The credentials provided do not match any user"
+    "error":"Invalid username or password"
+}
+```
+or
+```json
+{
+    "error":"The credentials provided do not match any user"
 }
 ```
 
@@ -45,14 +82,14 @@ refresh_token | String | The previous refresh token
 Code 200:
 ```json
 {
-    "access": "abcdefgh",
-    "refresh": "abddeefd"
+    "access":"abcdefgh",
+    "refresh":"abddeefd"
 }
 ```
 Code 401:
 ```json
 {
-    "error": "The refresh token provided does not match any user"
+    "error":"The refresh token provided does not match any user"
 }
 ```
 
@@ -74,7 +111,7 @@ Code 200:
 Code 401:
 ```json
 {
-    "error": "Unauthorized auth token is invalid"
+    "error":"Unauthorized auth token is invalid"
 }
 ```
 
@@ -86,7 +123,7 @@ Code 401:
 
 Parameter | Type | Description
 ---|---|---
-item_id | Int | The item collected
+item_id  | Int | The item collected
 quantity | Int | The quantity of item collected
 
 **Response**: <br>
@@ -97,14 +134,14 @@ Code 200:
 Code 400:
 ```json
 {
-    "error": "An item with this id does not exist"
+    "error":"An item with this id does not exist"
 }
 ```
 
 Code 401:
 ```json
 {
-    "error": "Unauthorized auth token is invalid"
+    "error":"Unauthorized auth token is invalid"
 }
 ```
 
@@ -120,7 +157,7 @@ Code 200:
 Code 401:
 ```json
 {
-    "error": "Unauthorized auth token is invalid"
+    "error":"Unauthorized auth token is invalid"
 }
 ```
 
@@ -153,13 +190,13 @@ Code 200:
 Code 400: 
 ```json
 {
-    "error": "Location provided is invalid"
+    "error":"Location provided is invalid"
 }
 ```
 
 Code 401:
 ```json
 {
-    "error": "Unauthorized auth token is invalid"
+    "error":"Unauthorized auth token is invalid"
 }
 ```
