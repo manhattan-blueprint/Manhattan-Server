@@ -1,6 +1,6 @@
 FROM golang:1.11.1-alpine3.8
 
-WORKDIR /go/src/github.com/jaylees14/Manhattan-Server/
+WORKDIR /src/github.com/jaylees14/Manhattan-Server/
 
 COPY . .
 
