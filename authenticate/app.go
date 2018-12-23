@@ -126,6 +126,11 @@ func (a *App) registerUser(w http.ResponseWriter, r *http.Request) {
 			"Invalid username or password")
 		return
 	}
+	if len(accReq.Username) == 0 || len(accReq.Password) == 0 {
+		respondWithError(w, http.StatusBadRequest,
+			"Invalid username or password")
+		return
+	}
 
 	// Convert account request struct into database account struct
 	var acc Account
@@ -215,6 +220,11 @@ func (a *App) validateLogin(w http.ResponseWriter, r *http.Request) {
 	var accReq AccountRequest
 	err := decoder.Decode(&accReq)
 	if err != nil {
+		respondWithError(w, http.StatusBadRequest,
+			"Invalid username or password")
+		return
+	}
+	if len(accReq.Username) == 0 || len(accReq.Password) == 0 {
 		respondWithError(w, http.StatusBadRequest,
 			"Invalid username or password")
 		return

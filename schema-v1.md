@@ -2,6 +2,7 @@
 
 The base URL for the schema is `http://foo.com` <br>
 All endpoints must start with `/api/v1`<br>
+No POST parameters can be blank
 All requests, aside from Authentication, must contain the access token as a header
 `Authorization: Bearer <token>`
 
