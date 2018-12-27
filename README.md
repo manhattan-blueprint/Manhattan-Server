@@ -1,25 +1,51 @@
 # Manhattan Server
 
-The server for the game Blueprint by Manhattan, using Docker.
+The server for the game Blueprint by Manhattan, using Docker and MySQL.
 
-## Deployment Instructions
+## Local Deployment Instructions
 
-With Docker installed, first build the image for each service using the build script, `build.sh`, since the docker-compose file assumes the images already exist. Then initialize the current node, i.e. computer, as the swarm manager:
+### Database setup
 
-`docker swarm init`
+With a local MySQL server running, from the root directory execute the database creation script:
 
-Next, in the root directory, run all the services as an app with:
+`> mysql -u DATABASE_USERNAME -p < /database/create.sql`
 
-`docker stack deploy -c docker-compose.yml blueprint`
+Where `DATABASE_USERNAME` will depend on your local MySQL server credentials.
 
-You can check they are running with:
+### Configuration files
 
-`docker service ls`
+If necessary, edit the configuration file in the `authenticate`, `inventory` and `resource` directories. The default values are:
 
-To take down the app, enter:
+* `"port": 8000`
+* `"dbUsername": "root"`
+* `"dbPassword": ""`
+* `"dbHost": "host.docker.internal"`
+* `"dbName": "blueprint"`
 
-`docker stack rm blueprint`
+This configuration:
+* Opens port 8000 of the Docker container
+* Assumes credentials exist for the local MySQL database with a username of "root" and a blank password
+* Assumes a MySQL server is hosted locally **not** within a Docker container
+* The database name is set to "blueprint"
 
-To take down the swarm, enter:
+Note, the configuration file in the `inventory` and `resource` directories currently only specify the port to open. These will be updated to match the configuration above when the respective API calls are implemented.
 
-`docker swarm leave --force`
+### Deployment
+
+With the database and configuration files setup and Docker installed, to build the images for each service and deploy the server using Docker swarm, from the root directory type:
+
+`> make`
+
+You can check the services are running with:
+
+`> docker service ls`
+
+To stop the services and take down the Docker swarm, type:
+
+`> make clean`
+
+## Local Testing Instructions
+
+With the database and configuration files setup and Docker installed, to build the images for each service and run the tests, from the root directory type:
+
+`> make test`
