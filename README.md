@@ -26,7 +26,7 @@ This configuration:
 * Opens port 8000 of the Docker container
 * Assumes credentials exist for the local MySQL database with a username of "root" and a blank password
 * Assumes a MySQL server is hosted locally **not** within a Docker container
-* The database name is set to "blueprint".
+* The database name is set to "blueprint"
 
 Note, the configuration file in the `inventory` and `resource` directories currently only specify the port to open. These will be updated to match the configuration above when the respective API calls are implemented.
 
