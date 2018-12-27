@@ -111,6 +111,23 @@ func TestRegisterInvalidUser(t *testing.T) {
 	checkResponseCode(t, http.StatusBadRequest, res.Code)
 }
 
+// Check valid JSON with blank fields are not accepted for registration
+func TestRegisterBlankUser(t *testing.T) {
+	clearTokenTable(t)
+	clearAccountTable(t)
+
+	payload := []byte(`{"username":"","password":""}`)
+
+	req, err := http.NewRequest("POST", "/api/v1/authenticate/register",
+		bytes.NewBuffer(payload))
+	if err != nil {
+		t.Errorf("Failed to create request")
+	}
+
+	res := executeRequest(req)
+	checkResponseCode(t, http.StatusBadRequest, res.Code)
+}
+
 // Check valid JSONs are accepted for registration and tokens returned
 func TestRegisterValidUser(t *testing.T) {
 	clearTokenTable(t)
