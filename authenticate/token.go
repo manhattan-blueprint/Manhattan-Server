@@ -18,10 +18,7 @@ func (tok *Token) CreateToken(db *sql.DB) error {
 	// Prepared statements implemented by sql package
 	_, err := db.Exec(stmt, tok.PairID, tok.UserID, tok.Access, tok.Refresh,
 		tok.AccessExpire, tok.RefreshExpire)
-	if err != nil {
-		return err
-	}
-	return nil
+	return err
 }
 
 func (tok *Token) GetTokens(db *sql.DB) error {

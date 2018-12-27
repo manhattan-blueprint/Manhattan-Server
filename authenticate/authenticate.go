@@ -11,8 +11,7 @@ func main() {
 	fmt.Println("hello authenticate")
 
 	// Get the configuration
-	var err error
-	config, err = GetConfiguration("conf.json")
+	config, err := GetConfiguration("conf.json")
 	if err != nil {
 		log.Fatal(err)
 	}

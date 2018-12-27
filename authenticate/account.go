@@ -14,10 +14,7 @@ func (acc *Account) CreateAccount(db *sql.DB) error {
 	stmt := "INSERT INTO account VALUES (?, ?, ?)"
 	// Prepared statements implemented by sql package
 	_, err := db.Exec(stmt, acc.UserID, acc.Username, acc.Password)
-	if err != nil {
-		return err
-	}
-	return nil
+	return err
 }
 
 func (acc *Account) GetPassword(db *sql.DB) error {

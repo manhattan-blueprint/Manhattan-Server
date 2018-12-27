@@ -87,8 +87,7 @@ func generateID(db *sql.DB, table string, targetID string) (uint32, error) {
 	random := mrand.New(seed)
 	stmt := fmt.Sprintf("SELECT COUNT(*) FROM %s WHERE %s=?", table, targetID)
 	var id uint32
-	var idCount Count
-	idCount.Value = 1
+	idCount := Count{Value: 1}
 	for idCount.Value != 0 {
 		id = random.Uint32()
 		err := db.QueryRow(stmt, id).Scan(&idCount.Value)
@@ -109,10 +108,7 @@ func generateToken(n int) (string, error) {
 func generateRandomBytes(n int) ([]byte, error) {
 	b := make([]byte, n)
 	_, err := crand.Read(b)
-	if err != nil {
-		return nil, err
-	}
-	return b, nil
+	return b, err
 }
 
 /* Create a new user and return auth tokens */
@@ -126,6 +122,7 @@ func (a *App) registerUser(w http.ResponseWriter, r *http.Request) {
 			"Invalid username or password")
 		return
 	}
+	// Check username and password fields are not blank
 	if len(accReq.Username) == 0 || len(accReq.Password) == 0 {
 		respondWithError(w, http.StatusBadRequest,
 			"Invalid username or password")
@@ -133,9 +130,10 @@ func (a *App) registerUser(w http.ResponseWriter, r *http.Request) {
 	}
 
 	// Convert account request struct into database account struct
-	var acc Account
-	acc.Username = accReq.Username
-	acc.Password = []byte(accReq.Password)
+	acc := Account{
+		Username: accReq.Username,
+		Password: []byte(accReq.Password),
+	}
 
 	// Check no accounts with the same username exist
 	usernameStmt := "SELECT COUNT(*) FROM account WHERE username=?"
@@ -170,8 +168,7 @@ func (a *App) registerUser(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	var tok Token
-	tok.UserID = acc.UserID
+	tok := Token{UserID: acc.UserID}
 	// Create a unique pair_id
 	tok.PairID, err = generateID(a.DB, "token", "pair_id")
 	if err != nil {
@@ -207,9 +204,10 @@ func (a *App) registerUser(w http.ResponseWriter, r *http.Request) {
 	}
 
 	// Return token pair
-	var tokRes TokenResponse
-	tokRes.Access = tok.Access
-	tokRes.Refresh = tok.Refresh
+	tokRes := TokenResponse{
+		Access:  tok.Access,
+		Refresh: tok.Refresh,
+	}
 	respondWithJSON(w, http.StatusOK, tokRes)
 }
 
@@ -231,8 +229,7 @@ func (a *App) validateLogin(w http.ResponseWriter, r *http.Request) {
 	}
 
 	// Convert account request struct into database account struct
-	var acc Account
-	acc.Username = accReq.Username
+	acc := Account{Username: accReq.Username}
 
 	// Get hashed password
 	err = acc.GetPassword(a.DB)
@@ -267,8 +264,7 @@ func (a *App) validateLogin(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	var tok Token
-	tok.UserID = acc.UserID
+	tok := Token{UserID: acc.UserID}
 	// Create a unique pair_id
 	tok.PairID, err = generateID(a.DB, "token", "pair_id")
 	if err != nil {
@@ -304,8 +300,9 @@ func (a *App) validateLogin(w http.ResponseWriter, r *http.Request) {
 	}
 
 	// Return token pair
-	var tokRes TokenResponse
-	tokRes.Access = tok.Access
-	tokRes.Refresh = tok.Refresh
+	tokRes := TokenResponse{
+		Access:  tok.Access,
+		Refresh: tok.Refresh,
+	}
 	respondWithJSON(w, http.StatusOK, tokRes)
 }
