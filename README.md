@@ -49,3 +49,42 @@ To stop the services and take down the Docker swarm, type:
 With the database and configuration files setup and Docker installed, to build the images for each service and run the tests, from the root directory type:
 
 `> make test`
+
+## Item Schema
+
+The item schema JSON can be visualised as an item tree:
+
+![Item tree image has not loaded.](https://github.com/jaylees14/Manhattan-Server/schemas/images/item_tree.pdf "Item tree")
+
+Where item types match the item tree legend:
+
+| Item type |                 Meaning                |
+|:---------:|:--------------------------------------:|
+|     1     |            Primary resource            |
+|     2     |  Crafted from blueprint and placeable  |
+|     3     | Crafted from blueprint and unplaceable |
+|     4     | Crafted from machinery and unplaceable |
+|     5     |    Crafted from blueprint and a goal   |
+
+### Quick Reference
+
+For quick item ID to item name reference:
+
+| Item ID |    Name    |
+|:-------:|:----------:|
+|    1    |    wood    |
+|    2    |    stone   |
+|    3    |    sand    |
+|    4    |  iron ore  |
+|    5    |    coal    |
+|    6    |   rubber   |
+|    7    |   furnace  |
+|    8    |    steel   |
+|    9    |    wheel   |
+|    10   |    chair   |
+|    11   |    glass   |
+|    12   |    wire    |
+|    13   |   welder   |
+|    14   |  generator |
+|    15   |    frame   |
+|    16   | dune buggy |
