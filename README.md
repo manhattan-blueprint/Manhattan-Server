@@ -54,7 +54,7 @@ With the database and configuration files setup and Docker installed, to build t
 
 The item schema JSON can be visualised as an item tree:
 
-![Item tree image has not loaded.](schemas/images/item_tree.pdf "Item tree")
+![Item tree image has not loaded.](schemas/images/item_tree.jpg "Item tree")
 
 Where item types match the item tree legend:
 
