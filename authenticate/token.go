@@ -7,8 +7,8 @@ import (
 type Token struct {
 	PairID        uint32 `json:"paid_id"`
 	UserID        uint32 `json:"user_id"`
-	Access        string `json:"access"`
-	Refresh       string `json:"refresh"`
+	Access        []byte `json:"access"`
+	Refresh       []byte `json:"refresh"`
 	AccessExpire  int64  `json:"access_expire"`
 	RefreshExpire int64  `json:"refresh_expire"`
 }

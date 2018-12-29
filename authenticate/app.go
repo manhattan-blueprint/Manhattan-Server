@@ -98,10 +98,10 @@ func generateID(db *sql.DB, table string, targetID string) (uint32, error) {
 	return id, nil
 }
 
-/* Generate a random token string of given length */
-func generateToken(n int) (string, error) {
+/* Generate a random token byte array of given length */
+func generateToken(n int) ([]byte, error) {
 	b, err := generateRandomBytes(n)
-	return base64.URLEncoding.EncodeToString(b)[:n], err
+	return b[:n], err
 }
 
 /* Generate a random byte array */
@@ -176,8 +176,19 @@ func (a *App) registerUser(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	// Create access token
-	tok.Access, err = generateToken(64)
+	// Create access token, 48 byte array encodes to 64 character string
+	tok.Access, err = generateToken(48)
+	if err != nil {
+		respondWithError(w, http.StatusInternalServerError, err.Error())
+		return
+	}
+	// Create token response
+	tokRes := TokenResponse{
+		Access: base64.URLEncoding.EncodeToString(tok.Access),
+	}
+	// Hash the access token
+	tok.Access, err = bcrypt.GenerateFromPassword(tok.Access,
+		bcrypt.DefaultCost)
 	if err != nil {
 		respondWithError(w, http.StatusInternalServerError, err.Error())
 		return
@@ -186,8 +197,17 @@ func (a *App) registerUser(w http.ResponseWriter, r *http.Request) {
 	tok.AccessExpire = time.Now().AddDate(accessExpire[0], accessExpire[1],
 		accessExpire[2]).UnixNano()
 
-	// Create refresh token
-	tok.Refresh, err = generateToken(64)
+	// Create refresh token, 48 byte array encodes to 64 character string
+	tok.Refresh, err = generateToken(48)
+	if err != nil {
+		respondWithError(w, http.StatusInternalServerError, err.Error())
+		return
+	}
+	// Add the refresh token to the token response
+	tokRes.Refresh = base64.URLEncoding.EncodeToString(tok.Refresh)
+	// Hash the refresh token
+	tok.Refresh, err = bcrypt.GenerateFromPassword(tok.Refresh,
+		bcrypt.DefaultCost)
 	if err != nil {
 		respondWithError(w, http.StatusInternalServerError, err.Error())
 		return
@@ -204,11 +224,21 @@ func (a *App) registerUser(w http.ResponseWriter, r *http.Request) {
 	}
 
 	// Return token pair
-	tokRes := TokenResponse{
-		Access:  tok.Access,
-		Refresh: tok.Refresh,
-	}
 	respondWithJSON(w, http.StatusOK, tokRes)
+
+	/* Decode token string and compare, for future use
+	decodeRes, err := base64.URLEncoding.DecodeString(tokRes.Access)
+	if err != nil {
+		respondWithError(w, http.StatusInternalServerError, err.Error())
+		return
+	}
+	err = bcrypt.CompareHashAndPassword(tok.Access, decodeRes)
+	if err != nil {
+		fmt.Printf("[WILL] FAIL: %s\n", err.Error())
+	} else {
+		fmt.Printf("[WILL] PASS\n")
+	}
+	*/
 }
 
 /* Validate a user login and return auth tokens */
@@ -272,8 +302,19 @@ func (a *App) validateLogin(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	// Create access token
-	tok.Access, err = generateToken(64)
+	// Create access token, 48 byte array encodes to 64 character string
+	tok.Access, err = generateToken(48)
+	if err != nil {
+		respondWithError(w, http.StatusInternalServerError, err.Error())
+		return
+	}
+	// Create token response
+	tokRes := TokenResponse{
+		Access: base64.URLEncoding.EncodeToString(tok.Access),
+	}
+	// Hash the access token
+	tok.Access, err = bcrypt.GenerateFromPassword(tok.Access,
+		bcrypt.DefaultCost)
 	if err != nil {
 		respondWithError(w, http.StatusInternalServerError, err.Error())
 		return
@@ -282,8 +323,17 @@ func (a *App) validateLogin(w http.ResponseWriter, r *http.Request) {
 	tok.AccessExpire = time.Now().AddDate(accessExpire[0], accessExpire[1],
 		accessExpire[2]).UnixNano()
 
-	// Create refresh token
-	tok.Refresh, err = generateToken(64)
+	// Create refresh token, 48 byte array encodes to 64 character string
+	tok.Refresh, err = generateToken(48)
+	if err != nil {
+		respondWithError(w, http.StatusInternalServerError, err.Error())
+		return
+	}
+	// Add the refresh token to the token response
+	tokRes.Refresh = base64.URLEncoding.EncodeToString(tok.Refresh)
+	// Hash the refresh token
+	tok.Refresh, err = bcrypt.GenerateFromPassword(tok.Refresh,
+		bcrypt.DefaultCost)
 	if err != nil {
 		respondWithError(w, http.StatusInternalServerError, err.Error())
 		return
@@ -300,9 +350,5 @@ func (a *App) validateLogin(w http.ResponseWriter, r *http.Request) {
 	}
 
 	// Return token pair
-	tokRes := TokenResponse{
-		Access:  tok.Access,
-		Refresh: tok.Refresh,
-	}
 	respondWithJSON(w, http.StatusOK, tokRes)
 }
