@@ -25,8 +25,6 @@ Code 200:
     "refresh":"ijklmnop"
 }
 ```
-Where each token is a 64 charater string.
-
 Code 400:
 ```json
 {
@@ -58,8 +56,6 @@ Code 200:
     "refresh":"ijklmnop"
 }
 ```
-Where each token is a 64 character string.
-
 Code 400:
 ```json
 {
@@ -88,11 +84,9 @@ Code 200:
 ```json
 {
     "access":"abcdefgh",
-    "refresh":"ijklmnop"
+    "refresh":"abddeefd"
 }
 ```
-Where each token is a 64 character string.
-
 Code 401:
 ```json
 {
