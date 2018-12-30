@@ -40,6 +40,8 @@ type Count struct {
 	Value int
 }
 
+const TOKEN_SIZE int = 64
+
 // Expiration in years, months, days
 var accessExpire = [3]int{0, 1, 0}
 var refreshExpire = [3]int{1, 0, 0}
@@ -129,7 +131,7 @@ func respondWithTokens(db *sql.DB, w http.ResponseWriter, id uint32) {
 	}
 
 	// Create access token
-	tok.Access, err = generateToken(64)
+	tok.Access, err = generateToken(TOKEN_SIZE)
 	if err != nil {
 		respondWithError(w, http.StatusInternalServerError, err.Error())
 		return
@@ -139,7 +141,7 @@ func respondWithTokens(db *sql.DB, w http.ResponseWriter, id uint32) {
 		accessExpire[2]).UnixNano()
 
 	// Create refresh token
-	tok.Refresh, err = generateToken(64)
+	tok.Refresh, err = generateToken(TOKEN_SIZE)
 	if err != nil {
 		respondWithError(w, http.StatusInternalServerError, err.Error())
 		return
@@ -290,7 +292,7 @@ func (a *App) refreshTokens(w http.ResponseWriter, r *http.Request) {
 			"Invalid refresh token")
 		return
 	}
-	if len(tokReq.Refresh) != 64 {
+	if len(tokReq.Refresh) != TOKEN_SIZE {
 		respondWithError(w, http.StatusBadRequest,
 			"Invalid refresh token")
 		return
