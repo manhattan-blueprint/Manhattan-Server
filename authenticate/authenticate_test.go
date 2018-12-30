@@ -174,6 +174,11 @@ func TestRegisterExistingUsername(t *testing.T) {
 	res := executeRequest(req)
 	checkResponseCode(t, http.StatusOK, res.Code)
 
+	req, err = http.NewRequest("POST", "/api/v1/authenticate/register",
+		bytes.NewBuffer(payload))
+	if err != nil {
+		t.Errorf("Failed to create request")
+	}
 	res = executeRequest(req)
 	checkResponseCode(t, http.StatusBadRequest, res.Code)
 }
@@ -459,6 +464,48 @@ func TestRefreshIncorrectToken(t *testing.T) {
 		t.Errorf("Failed to create request")
 	}
 
+	res = executeRequest(req)
+	checkResponseCode(t, http.StatusUnauthorized, res.Code)
+}
+
+/* Check token entry is removed after being refreshed */
+func TestRefreshRemoveToken(t *testing.T) {
+	clearTokenTable(t)
+	clearAccountTable(t)
+
+	// First register a user
+	payload := []byte(`{"username":"will","password":"smith"}`)
+
+	req, err := http.NewRequest("POST", "/api/v1/authenticate/register",
+		bytes.NewBuffer(payload))
+	if err != nil {
+		t.Errorf("Failed to create request")
+	}
+
+	res := executeRequest(req)
+	checkResponseCode(t, http.StatusOK, res.Code)
+
+	decoder := json.NewDecoder(res.Body)
+	var tok Token
+	err = decoder.Decode(&tok)
+
+	// Refresh with correct token
+	payload = []byte(fmt.Sprintf("{\"refresh\":\"%s\"}", tok.Refresh))
+	req, err = http.NewRequest("POST", "/api/v1/authenticate/refresh",
+		bytes.NewBuffer(payload))
+	if err != nil {
+		t.Errorf("Failed to create request")
+	}
+
+	res = executeRequest(req)
+	checkResponseCode(t, http.StatusOK, res.Code)
+
+	// Reuse the previous token
+	req, err = http.NewRequest("POST", "/api/v1/authenticate/refresh",
+		bytes.NewBuffer(payload))
+	if err != nil {
+		t.Errorf("Failed to create request")
+	}
 	res = executeRequest(req)
 	checkResponseCode(t, http.StatusUnauthorized, res.Code)
 }
