@@ -117,6 +117,52 @@ func generateRandomBytes(n int) ([]byte, error) {
 	return b, err
 }
 
+func respondWithTokens(db *sql.DB, w http.ResponseWriter, id uint32) {
+	tok := Token{UserID: id}
+	// Create a unique pair_id
+	var err error
+	tok.PairID, err = generateID(db, "token", "pair_id")
+
+	if err != nil {
+		respondWithError(w, http.StatusInternalServerError, err.Error())
+		return
+	}
+
+	// Create access token
+	tok.Access, err = generateToken(64)
+	if err != nil {
+		respondWithError(w, http.StatusInternalServerError, err.Error())
+		return
+	}
+	// Change expiry
+	tok.AccessExpire = time.Now().AddDate(accessExpire[0], accessExpire[1],
+		accessExpire[2]).UnixNano()
+
+	// Create refresh token
+	tok.Refresh, err = generateToken(64)
+	if err != nil {
+		respondWithError(w, http.StatusInternalServerError, err.Error())
+		return
+	}
+	// Change expiry
+	tok.RefreshExpire = time.Now().AddDate(refreshExpire[0], refreshExpire[1],
+		refreshExpire[2]).UnixNano()
+
+	// Create the token entry
+	err = tok.CreateToken(db)
+	if err != nil {
+		respondWithError(w, http.StatusInternalServerError, err.Error())
+		return
+	}
+
+	// Return token pair
+	tokRes := TokenResponse{
+		Access:  tok.Access,
+		Refresh: tok.Refresh,
+	}
+	respondWithJSON(w, http.StatusOK, tokRes)
+}
+
 /* Create a new user and return auth tokens */
 func (a *App) registerUser(w http.ResponseWriter, r *http.Request) {
 	// Decode json body into account request
@@ -174,47 +220,7 @@ func (a *App) registerUser(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	tok := Token{UserID: acc.UserID}
-	// Create a unique pair_id
-	tok.PairID, err = generateID(a.DB, "token", "pair_id")
-	if err != nil {
-		respondWithError(w, http.StatusInternalServerError, err.Error())
-		return
-	}
-
-	// Create access token
-	tok.Access, err = generateToken(64)
-	if err != nil {
-		respondWithError(w, http.StatusInternalServerError, err.Error())
-		return
-	}
-	// Change expiry
-	tok.AccessExpire = time.Now().AddDate(accessExpire[0], accessExpire[1],
-		accessExpire[2]).UnixNano()
-
-	// Create refresh token
-	tok.Refresh, err = generateToken(64)
-	if err != nil {
-		respondWithError(w, http.StatusInternalServerError, err.Error())
-		return
-	}
-	// Change expiry
-	tok.RefreshExpire = time.Now().AddDate(refreshExpire[0], refreshExpire[1],
-		refreshExpire[2]).UnixNano()
-
-	// Create the token entry
-	err = tok.CreateToken(a.DB)
-	if err != nil {
-		respondWithError(w, http.StatusInternalServerError, err.Error())
-		return
-	}
-
-	// Return token pair
-	tokRes := TokenResponse{
-		Access:  tok.Access,
-		Refresh: tok.Refresh,
-	}
-	respondWithJSON(w, http.StatusOK, tokRes)
+	respondWithTokens(a.DB, w, acc.UserID)
 }
 
 /* Validate a user login and return auth tokens */
@@ -270,47 +276,7 @@ func (a *App) validateLogin(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	tok := Token{UserID: acc.UserID}
-	// Create a unique pair_id
-	tok.PairID, err = generateID(a.DB, "token", "pair_id")
-	if err != nil {
-		respondWithError(w, http.StatusInternalServerError, err.Error())
-		return
-	}
-
-	// Create access token
-	tok.Access, err = generateToken(64)
-	if err != nil {
-		respondWithError(w, http.StatusInternalServerError, err.Error())
-		return
-	}
-	// Change expiry
-	tok.AccessExpire = time.Now().AddDate(accessExpire[0], accessExpire[1],
-		accessExpire[2]).UnixNano()
-
-	// Create refresh token
-	tok.Refresh, err = generateToken(64)
-	if err != nil {
-		respondWithError(w, http.StatusInternalServerError, err.Error())
-		return
-	}
-	// Change expiry
-	tok.RefreshExpire = time.Now().AddDate(refreshExpire[0], refreshExpire[1],
-		refreshExpire[2]).UnixNano()
-
-	// Create the token entry
-	err = tok.CreateToken(a.DB)
-	if err != nil {
-		respondWithError(w, http.StatusInternalServerError, err.Error())
-		return
-	}
-
-	// Return token pair
-	tokRes := TokenResponse{
-		Access:  tok.Access,
-		Refresh: tok.Refresh,
-	}
-	respondWithJSON(w, http.StatusOK, tokRes)
+	respondWithTokens(a.DB, w, acc.UserID)
 }
 
 /* Validate a refresh token and return auth tokens */
@@ -368,46 +334,5 @@ func (a *App) refreshTokens(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	// Create a new token pair
-	newTok := Token{UserID: tok.UserID}
-	// Create a unique pair_id
-	newTok.PairID, err = generateID(a.DB, "token", "pair_id")
-	if err != nil {
-		respondWithError(w, http.StatusInternalServerError, err.Error())
-		return
-	}
-
-	// Create access token
-	newTok.Access, err = generateToken(64)
-	if err != nil {
-		respondWithError(w, http.StatusInternalServerError, err.Error())
-		return
-	}
-	// Change expiry
-	newTok.AccessExpire = time.Now().AddDate(accessExpire[0], accessExpire[1],
-		accessExpire[2]).UnixNano()
-
-	// Create refresh token
-	newTok.Refresh, err = generateToken(64)
-	if err != nil {
-		respondWithError(w, http.StatusInternalServerError, err.Error())
-		return
-	}
-	// Change expiry
-	newTok.RefreshExpire = time.Now().AddDate(refreshExpire[0], refreshExpire[1],
-		refreshExpire[2]).UnixNano()
-
-	// Create the token entry
-	err = newTok.CreateToken(a.DB)
-	if err != nil {
-		respondWithError(w, http.StatusInternalServerError, err.Error())
-		return
-	}
-
-	// Return token pair
-	tokRes := TokenResponse{
-		Access:  newTok.Access,
-		Refresh: newTok.Refresh,
-	}
-	respondWithJSON(w, http.StatusOK, tokRes)
+	respondWithTokens(a.DB, w, tok.UserID)
 }
