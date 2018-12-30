@@ -27,6 +27,10 @@ type AccountRequest struct {
 	Password string `json:"password"`
 }
 
+type TokenRequest struct {
+	Refresh string `json:"refresh"`
+}
+
 type TokenResponse struct {
 	Access  string `json:"access"`
 	Refresh string `json:"refresh"`
@@ -35,6 +39,8 @@ type TokenResponse struct {
 type Count struct {
 	Value int
 }
+
+const TOKEN_SIZE int = 64
 
 // Expiration in years, months, days
 var accessExpire = [3]int{0, 1, 0}
@@ -66,6 +72,8 @@ func (a *App) initialiseRoutes() {
 		a.registerUser).Methods("POST")
 	a.Router.HandleFunc(fmt.Sprintf("%s/authenticate", prefix),
 		a.validateLogin).Methods("POST")
+	a.Router.HandleFunc(fmt.Sprintf("%s/authenticate/refresh", prefix),
+		a.refreshTokens).Methods("POST")
 }
 
 /* Respond with a error JSON */
@@ -109,6 +117,52 @@ func generateRandomBytes(n int) ([]byte, error) {
 	b := make([]byte, n)
 	_, err := crand.Read(b)
 	return b, err
+}
+
+func respondWithTokens(db *sql.DB, w http.ResponseWriter, id uint32) {
+	tok := Token{UserID: id}
+	// Create a unique pair_id
+	var err error
+	tok.PairID, err = generateID(db, "token", "pair_id")
+
+	if err != nil {
+		respondWithError(w, http.StatusInternalServerError, err.Error())
+		return
+	}
+
+	// Create access token
+	tok.Access, err = generateToken(TOKEN_SIZE)
+	if err != nil {
+		respondWithError(w, http.StatusInternalServerError, err.Error())
+		return
+	}
+	// Change expiry
+	tok.AccessExpire = time.Now().AddDate(accessExpire[0], accessExpire[1],
+		accessExpire[2]).UnixNano()
+
+	// Create refresh token
+	tok.Refresh, err = generateToken(TOKEN_SIZE)
+	if err != nil {
+		respondWithError(w, http.StatusInternalServerError, err.Error())
+		return
+	}
+	// Change expiry
+	tok.RefreshExpire = time.Now().AddDate(refreshExpire[0], refreshExpire[1],
+		refreshExpire[2]).UnixNano()
+
+	// Create the token entry
+	err = tok.CreateToken(db)
+	if err != nil {
+		respondWithError(w, http.StatusInternalServerError, err.Error())
+		return
+	}
+
+	// Return token pair
+	tokRes := TokenResponse{
+		Access:  tok.Access,
+		Refresh: tok.Refresh,
+	}
+	respondWithJSON(w, http.StatusOK, tokRes)
 }
 
 /* Create a new user and return auth tokens */
@@ -168,47 +222,7 @@ func (a *App) registerUser(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	tok := Token{UserID: acc.UserID}
-	// Create a unique pair_id
-	tok.PairID, err = generateID(a.DB, "token", "pair_id")
-	if err != nil {
-		respondWithError(w, http.StatusInternalServerError, err.Error())
-		return
-	}
-
-	// Create access token
-	tok.Access, err = generateToken(64)
-	if err != nil {
-		respondWithError(w, http.StatusInternalServerError, err.Error())
-		return
-	}
-	// Change expiry
-	tok.AccessExpire = time.Now().AddDate(accessExpire[0], accessExpire[1],
-		accessExpire[2]).UnixNano()
-
-	// Create refresh token
-	tok.Refresh, err = generateToken(64)
-	if err != nil {
-		respondWithError(w, http.StatusInternalServerError, err.Error())
-		return
-	}
-	// Change expiry
-	tok.RefreshExpire = time.Now().AddDate(refreshExpire[0], refreshExpire[1],
-		refreshExpire[2]).UnixNano()
-
-	// Create the token entry
-	err = tok.CreateToken(a.DB)
-	if err != nil {
-		respondWithError(w, http.StatusInternalServerError, err.Error())
-		return
-	}
-
-	// Return token pair
-	tokRes := TokenResponse{
-		Access:  tok.Access,
-		Refresh: tok.Refresh,
-	}
-	respondWithJSON(w, http.StatusOK, tokRes)
+	respondWithTokens(a.DB, w, acc.UserID)
 }
 
 /* Validate a user login and return auth tokens */
@@ -236,7 +250,7 @@ func (a *App) validateLogin(w http.ResponseWriter, r *http.Request) {
 	if err != nil {
 		switch err {
 		case sql.ErrNoRows:
-			respondWithError(w, http.StatusBadRequest,
+			respondWithError(w, http.StatusUnauthorized,
 				"The credentials provided do not match any user")
 		default:
 			respondWithError(w, http.StatusInternalServerError, err.Error())
@@ -246,7 +260,7 @@ func (a *App) validateLogin(w http.ResponseWriter, r *http.Request) {
 	// Check password
 	err = bcrypt.CompareHashAndPassword(acc.Password, []byte(accReq.Password))
 	if err != nil {
-		respondWithError(w, http.StatusBadRequest,
+		respondWithError(w, http.StatusUnauthorized,
 			"The credentials provided do not match any user")
 		return
 	}
@@ -264,45 +278,63 @@ func (a *App) validateLogin(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	tok := Token{UserID: acc.UserID}
-	// Create a unique pair_id
-	tok.PairID, err = generateID(a.DB, "token", "pair_id")
+	respondWithTokens(a.DB, w, acc.UserID)
+}
+
+/* Validate a refresh token and return auth tokens */
+func (a *App) refreshTokens(w http.ResponseWriter, r *http.Request) {
+	// Decode json body into token request
+	decoder := json.NewDecoder(r.Body)
+	var tokReq TokenRequest
+	err := decoder.Decode(&tokReq)
+	if err != nil {
+		respondWithError(w, http.StatusBadRequest,
+			"Invalid refresh token")
+		return
+	}
+	if len(tokReq.Refresh) != TOKEN_SIZE {
+		respondWithError(w, http.StatusBadRequest,
+			"Invalid refresh token")
+		return
+	}
+
+	// Convert token request struct into database token struct
+	tok := Token{Refresh: tokReq.Refresh}
+
+	// Check refresh token exists
+	refreshStmt := "SELECT COUNT(*) FROM token WHERE refresh=?"
+	var refreshCount Count
+	err = a.DB.QueryRow(refreshStmt, tok.Refresh).Scan(&refreshCount.Value)
+	if err != nil {
+		respondWithError(w, http.StatusInternalServerError, err.Error())
+		return
+	}
+	if refreshCount.Value != 1 {
+		// Also handles the near impossible case of two refresh tokens matching
+		respondWithError(w, http.StatusUnauthorized,
+			"The refresh token provided does not match any user")
+		return
+	}
+
+	// Get user_id
+	err = tok.GetID(a.DB)
+	if err != nil {
+		switch err {
+		case sql.ErrNoRows:
+			respondWithError(w, http.StatusInternalServerError,
+				"User not found after successful validation")
+		default:
+			respondWithError(w, http.StatusInternalServerError, err.Error())
+		}
+		return
+	}
+
+	// Remove token
+	err = tok.RemoveToken(a.DB)
 	if err != nil {
 		respondWithError(w, http.StatusInternalServerError, err.Error())
 		return
 	}
 
-	// Create access token
-	tok.Access, err = generateToken(64)
-	if err != nil {
-		respondWithError(w, http.StatusInternalServerError, err.Error())
-		return
-	}
-	// Change expiry
-	tok.AccessExpire = time.Now().AddDate(accessExpire[0], accessExpire[1],
-		accessExpire[2]).UnixNano()
-
-	// Create refresh token
-	tok.Refresh, err = generateToken(64)
-	if err != nil {
-		respondWithError(w, http.StatusInternalServerError, err.Error())
-		return
-	}
-	// Change expiry
-	tok.RefreshExpire = time.Now().AddDate(refreshExpire[0], refreshExpire[1],
-		refreshExpire[2]).UnixNano()
-
-	// Create the token entry
-	err = tok.CreateToken(a.DB)
-	if err != nil {
-		respondWithError(w, http.StatusInternalServerError, err.Error())
-		return
-	}
-
-	// Return token pair
-	tokRes := TokenResponse{
-		Access:  tok.Access,
-		Refresh: tok.Refresh,
-	}
-	respondWithJSON(w, http.StatusOK, tokRes)
+	respondWithTokens(a.DB, w, tok.UserID)
 }

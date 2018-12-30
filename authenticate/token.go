@@ -21,7 +21,18 @@ func (tok *Token) CreateToken(db *sql.DB) error {
 	return err
 }
 
+func (tok *Token) RemoveToken(db *sql.DB) error {
+	stmt := "DELETE FROM token WHERE refresh=?"
+	_, err := db.Exec(stmt, tok.Refresh)
+	return err
+}
+
 func (tok *Token) GetTokens(db *sql.DB) error {
 	stmt := "SELECT access, refresh FROM token WHERE user_id=?"
 	return db.QueryRow(stmt, tok.UserID).Scan(&tok.Access, &tok.Refresh)
+}
+
+func (tok *Token) GetID(db *sql.DB) error {
+	stmt := "SELECT user_id FROM token WHERE refresh=?"
+	return db.QueryRow(stmt, tok.Refresh).Scan(&tok.UserID)
 }

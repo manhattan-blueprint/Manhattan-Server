@@ -4,7 +4,7 @@ The base URL for the schema is `http://foo.com` <br>
 All endpoints must start with `/api/v1`<br>
 No POST parameters can be blank
 All requests, aside from Authentication, must contain the access token as a header
-`Authorization: Bearer <token>`
+`Authorization: Bearer <token>`. Where each token is a 64 character string.
 
 # Authentication
 `/authenticate/register` (POST) <br>
@@ -62,7 +62,7 @@ Code 400:
     "error":"Invalid username or password"
 }
 ```
-or
+Code 401:
 ```json
 {
     "error":"The credentials provided do not match any user"
@@ -84,7 +84,13 @@ Code 200:
 ```json
 {
     "access":"abcdefgh",
-    "refresh":"abddeefd"
+    "refresh":"ijklmnop"
+}
+```
+Code 400:
+```json
+{
+    "error":"Invalid refresh token"
 }
 ```
 Code 401:
