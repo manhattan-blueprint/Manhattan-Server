@@ -278,7 +278,7 @@ func TestLoginIncorrectPassword(t *testing.T) {
 	}
 
 	res = executeRequest(req)
-	checkResponseCode(t, http.StatusBadRequest, res.Code)
+	checkResponseCode(t, http.StatusUnauthorized, res.Code)
 }
 
 /* Check login combination of incorrect username but existing password is
@@ -309,7 +309,7 @@ func TestLoginIncorrectUsername(t *testing.T) {
 	}
 
 	res = executeRequest(req)
-	checkResponseCode(t, http.StatusBadRequest, res.Code)
+	checkResponseCode(t, http.StatusUnauthorized, res.Code)
 }
 
 /* Check invalid JSON is not accepted for refresh */

@@ -62,7 +62,7 @@ Code 400:
     "error":"Invalid username or password"
 }
 ```
-or
+Code 401:
 ```json
 {
     "error":"The credentials provided do not match any user"

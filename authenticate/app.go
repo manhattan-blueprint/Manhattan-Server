@@ -242,7 +242,7 @@ func (a *App) validateLogin(w http.ResponseWriter, r *http.Request) {
 	if err != nil {
 		switch err {
 		case sql.ErrNoRows:
-			respondWithError(w, http.StatusBadRequest,
+			respondWithError(w, http.StatusUnauthorized,
 				"The credentials provided do not match any user")
 		default:
 			respondWithError(w, http.StatusInternalServerError, err.Error())
@@ -252,7 +252,7 @@ func (a *App) validateLogin(w http.ResponseWriter, r *http.Request) {
 	// Check password
 	err = bcrypt.CompareHashAndPassword(acc.Password, []byte(accReq.Password))
 	if err != nil {
-		respondWithError(w, http.StatusBadRequest,
+		respondWithError(w, http.StatusUnauthorized,
 			"The credentials provided do not match any user")
 		return
 	}
