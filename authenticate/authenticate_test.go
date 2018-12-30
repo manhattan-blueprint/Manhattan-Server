@@ -94,8 +94,8 @@ func checkResponseCode(t *testing.T, expected, actual int) {
 	}
 }
 
-// Check invalid JSONs are not accepted for registration
-func TestRegisterInvalidUser(t *testing.T) {
+/* Check invalid JSON is not accepted for registration */
+func TestRegisterInvalidJSON(t *testing.T) {
 	clearTokenTable(t)
 	clearAccountTable(t)
 
@@ -111,8 +111,8 @@ func TestRegisterInvalidUser(t *testing.T) {
 	checkResponseCode(t, http.StatusBadRequest, res.Code)
 }
 
-// Check valid JSON with blank fields are not accepted for registration
-func TestRegisterBlankUser(t *testing.T) {
+/* Check valid blank JSON is not accepted for registration */
+func TestRegisterBlankJSON(t *testing.T) {
 	clearTokenTable(t)
 	clearAccountTable(t)
 
@@ -128,8 +128,9 @@ func TestRegisterBlankUser(t *testing.T) {
 	checkResponseCode(t, http.StatusBadRequest, res.Code)
 }
 
-// Check valid JSONs are accepted for registration and tokens returned
-func TestRegisterValidUser(t *testing.T) {
+/* Check valid user is accepted for registration and 64 character tokens are
+** returned */
+func TestRegisterUser(t *testing.T) {
 	clearTokenTable(t)
 	clearAccountTable(t)
 
@@ -157,8 +158,8 @@ func TestRegisterValidUser(t *testing.T) {
 	}
 }
 
-// Check duplicate usernames are not accepted for registration
-func TestRegisterDuplicateUser(t *testing.T) {
+/* Check existing username is not accepted for registration */
+func TestRegisterExistingUsername(t *testing.T) {
 	clearTokenTable(t)
 	clearAccountTable(t)
 
@@ -177,8 +178,8 @@ func TestRegisterDuplicateUser(t *testing.T) {
 	checkResponseCode(t, http.StatusBadRequest, res.Code)
 }
 
-// Check invalid JSONs are not accepted for account validation
-func TestValidateInvalidUser(t *testing.T) {
+/* Check invalid JSON is not accepted for login */
+func TestLoginInvalidJSON(t *testing.T) {
 	clearTokenTable(t)
 	clearAccountTable(t)
 
@@ -194,7 +195,7 @@ func TestValidateInvalidUser(t *testing.T) {
 	res := executeRequest(req)
 	checkResponseCode(t, http.StatusOK, res.Code)
 
-	// Validate with invalid JSON
+	// Login with invalid JSON
 	payload = []byte(`{"will":"smith"}`)
 	req, err = http.NewRequest("POST", "/api/v1/authenticate",
 		bytes.NewBuffer(payload))
@@ -206,8 +207,9 @@ func TestValidateInvalidUser(t *testing.T) {
 	checkResponseCode(t, http.StatusBadRequest, res.Code)
 }
 
-// Check valid and correct JSONs are accepted and token returned
-func TestValidateValidUser(t *testing.T) {
+/* Check valid user is accepted for login and 64 character tokens are returned
+** */
+func TestLoginUser(t *testing.T) {
 	clearTokenTable(t)
 	clearAccountTable(t)
 
@@ -223,7 +225,7 @@ func TestValidateValidUser(t *testing.T) {
 	res := executeRequest(req)
 	checkResponseCode(t, http.StatusOK, res.Code)
 
-	// Validate with valid JSON
+	// Login with correct credentials
 	payload = []byte(`{"username":"will","password":"smith"}`)
 
 	req, err = http.NewRequest("POST", "/api/v1/authenticate",
@@ -248,8 +250,9 @@ func TestValidateValidUser(t *testing.T) {
 	}
 }
 
-// Check combination of existing username but incorrect password is rejected
-func TestValidateIncorrectPassword(t *testing.T) {
+/* Check login combination of existing username but incorrect password is
+** rejected */
+func TestLoginIncorrectPassword(t *testing.T) {
 	clearTokenTable(t)
 	clearAccountTable(t)
 
@@ -265,7 +268,7 @@ func TestValidateIncorrectPassword(t *testing.T) {
 	res := executeRequest(req)
 	checkResponseCode(t, http.StatusOK, res.Code)
 
-	// Validate with incorrect password
+	// Login with incorrect password
 	payload = []byte(`{"username":"will","password":"stretch"}`)
 
 	req, err = http.NewRequest("POST", "/api/v1/authenticate",
@@ -278,8 +281,9 @@ func TestValidateIncorrectPassword(t *testing.T) {
 	checkResponseCode(t, http.StatusBadRequest, res.Code)
 }
 
-// Check combination of incorrect username but existing password is rejected
-func TestValidateIncorrectUsername(t *testing.T) {
+/* Check login combination of incorrect username but existing password is
+** rejected */
+func TestLoginIncorrectUsername(t *testing.T) {
 	clearTokenTable(t)
 	clearAccountTable(t)
 
@@ -295,7 +299,7 @@ func TestValidateIncorrectUsername(t *testing.T) {
 	res := executeRequest(req)
 	checkResponseCode(t, http.StatusOK, res.Code)
 
-	// Validate with incorrect password
+	// Login with incorrect username but existing password
 	payload = []byte(`{"username":"stretch","password":"smith"}`)
 
 	req, err = http.NewRequest("POST", "/api/v1/authenticate",
@@ -306,4 +310,155 @@ func TestValidateIncorrectUsername(t *testing.T) {
 
 	res = executeRequest(req)
 	checkResponseCode(t, http.StatusBadRequest, res.Code)
+}
+
+/* Check invalid JSON is not accepted for refresh */
+func TestRefreshInvalidJSON(t *testing.T) {
+	clearTokenTable(t)
+	clearAccountTable(t)
+
+	payload := []byte(`{"will":"smith"}`)
+
+	req, err := http.NewRequest("POST", "/api/v1/authenticate/refresh",
+		bytes.NewBuffer(payload))
+	if err != nil {
+		t.Errorf("Failed to create request")
+	}
+
+	res := executeRequest(req)
+	checkResponseCode(t, http.StatusBadRequest, res.Code)
+}
+
+/* Check valid blank JSON is not accepted for refresh */
+func TestRefreshBlankToken(t *testing.T) {
+	clearTokenTable(t)
+	clearAccountTable(t)
+
+	payload := []byte(`{"refresh":""}`)
+
+	req, err := http.NewRequest("POST", "/api/v1/authenticate/refresh",
+		bytes.NewBuffer(payload))
+	if err != nil {
+		t.Errorf("Failed to create request")
+	}
+
+	res := executeRequest(req)
+	checkResponseCode(t, http.StatusBadRequest, res.Code)
+}
+
+/* Check refresh token of incorrect length is not accepted for refresh */
+func TestRefreshIncorrectTokenLength(t *testing.T) {
+	clearTokenTable(t)
+	clearAccountTable(t)
+
+	// Token with 63 characters
+	payload := []byte(`{"refresh":"abcdefghijklmnopqrstuvwxyz1234567890abcdefghijklmnopqrstuvwxyz1"}`)
+
+	req, err := http.NewRequest("POST", "/api/v1/authenticate/refresh",
+		bytes.NewBuffer(payload))
+	if err != nil {
+		t.Errorf("Failed to create request")
+	}
+
+	res := executeRequest(req)
+	checkResponseCode(t, http.StatusBadRequest, res.Code)
+
+	// Token with 65 characters
+	payload = []byte(`{"refresh":"abcdefghijklmnopqrstuvwxyz1234567890abcdefghijklmnopqrstuvwxyz123"}`)
+
+	req, err = http.NewRequest("POST", "/api/v1/authenticate/refresh",
+		bytes.NewBuffer(payload))
+	if err != nil {
+		t.Errorf("Failed to create request")
+	}
+
+	res = executeRequest(req)
+	checkResponseCode(t, http.StatusBadRequest, res.Code)
+}
+
+/* Check valid token is accepted for refresh and 64 character tokens are
+** returned */
+func TestRefreshToken(t *testing.T) {
+	clearTokenTable(t)
+	clearAccountTable(t)
+
+	// First register a user
+	payload := []byte(`{"username":"will","password":"smith"}`)
+
+	req, err := http.NewRequest("POST", "/api/v1/authenticate/register",
+		bytes.NewBuffer(payload))
+	if err != nil {
+		t.Errorf("Failed to create request")
+	}
+
+	res := executeRequest(req)
+	checkResponseCode(t, http.StatusOK, res.Code)
+
+	decoder := json.NewDecoder(res.Body)
+	var tok Token
+	err = decoder.Decode(&tok)
+
+	// Refresh with correct token
+	payload = []byte(fmt.Sprintf("{\"refresh\":\"%s\"}", tok.Refresh))
+	req, err = http.NewRequest("POST", "/api/v1/authenticate/refresh",
+		bytes.NewBuffer(payload))
+	if err != nil {
+		t.Errorf("Failed to create request")
+	}
+
+	res = executeRequest(req)
+	checkResponseCode(t, http.StatusOK, res.Code)
+
+	// Check tokens returned are of length 64
+	var m map[string]string
+	json.Unmarshal(res.Body.Bytes(), &m)
+	if len(m["access"]) != 64 {
+		t.Errorf("Expected access token of length 64. Actual length was %d",
+			len(m["access"]))
+	}
+	if len(m["refresh"]) != 64 {
+		t.Errorf("Expected refresh token of length 64. Actual length was %d",
+			len(m["refresh"]))
+	}
+}
+
+/* Check incorrect token is not accepted for refresh */
+func TestRefreshIncorrectToken(t *testing.T) {
+	clearTokenTable(t)
+	clearAccountTable(t)
+
+	// First register a user
+	payload := []byte(`{"username":"will","password":"smith"}`)
+
+	req, err := http.NewRequest("POST", "/api/v1/authenticate/register",
+		bytes.NewBuffer(payload))
+	if err != nil {
+		t.Errorf("Failed to create request")
+	}
+
+	res := executeRequest(req)
+	checkResponseCode(t, http.StatusOK, res.Code)
+
+	decoder := json.NewDecoder(res.Body)
+	var tok Token
+	err = decoder.Decode(&tok)
+
+	// Create incorrect token
+	var incorrectTok string
+	if tok.Refresh != "abcdefghijklmnopqrstuvwxyz1234567890abcdefghijklmnopqrstuvwxyz12" {
+		incorrectTok = "abcdefghijklmnopqrstuvwxyz1234567890abcdefghijklmnopqrstuvwxyz12"
+	} else {
+		fmt.Printf("What are the chances!\n")
+		incorrectTok = "abcdefghijklmnopqrstuvwxyz1234567890abcdefghijklmnopqrstuvwxyz13"
+	}
+
+	payload = []byte(fmt.Sprintf("{\"refresh\":\"%s\"}", incorrectTok))
+	req, err = http.NewRequest("POST", "/api/v1/authenticate/refresh",
+		bytes.NewBuffer(payload))
+	if err != nil {
+		t.Errorf("Failed to create request")
+	}
+
+	res = executeRequest(req)
+	checkResponseCode(t, http.StatusUnauthorized, res.Code)
 }

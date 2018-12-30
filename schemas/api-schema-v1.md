@@ -87,6 +87,12 @@ Code 200:
     "refresh":"ijklmnop"
 }
 ```
+Code 400:
+```json
+{
+    "error":"Invalid refresh token"
+}
+```
 Code 401:
 ```json
 {
