@@ -6,6 +6,7 @@ COPY . .
 
 RUN apk add --no-cache git &&\
     go get github.com/gorilla/mux &&\
+    go get github.com/go-sql-driver/mysql &&\
     go build -o inventory
 
 ENTRYPOINT ./inventory

@@ -119,6 +119,7 @@ func generateRandomBytes(n int) ([]byte, error) {
 	return b, err
 }
 
+/* Respond with auth tokens */
 func respondWithTokens(db *sql.DB, w http.ResponseWriter, id uint32) {
 	tok := Token{UserID: id}
 	// Create a unique pair_id
