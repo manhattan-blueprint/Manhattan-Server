@@ -124,14 +124,20 @@ Code 401:
 
 ---
 `/inventory` (POST) <br>
-**Description**: Add item to inventory
+**Description**: Add item(s) to inventory
 
 **Request Contents**:
 
 Parameter | Type | Description
 ---|---|---
-item_id  | Int | The item collected
-quantity | Int | The quantity of item collected
+items | List | List of item_id, quantity pairs to add
+
+Where each list element has the following contents:
+
+Parameter | Type | Description
+---|---|---
+item_id  | Int | The item to add (1 - 16 inclusive)
+quantity | Int | Quantity of the item to add (1 or greater)
 
 **Response**: <br>
 Code 200:
