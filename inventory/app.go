@@ -3,6 +3,7 @@ package main
 import (
 	"database/sql"
 	"encoding/json"
+	"errors"
 	"fmt"
 	"net/http"
 	"strconv"
@@ -66,23 +67,19 @@ func respondWithJSON(w http.ResponseWriter, code int, payload interface{}) {
 	w.Write(response)
 }
 
-func checkTokenAndGetID(db *sql.DB, w http.ResponseWriter,
-	r *http.Request) (uint32, bool) {
+func getIDFromToken(db *sql.DB, w http.ResponseWriter,
+	r *http.Request) (uint32, error) {
 	var id ID
 
 	// Get raw Authorization header
 	authHeader := r.Header.Get("Authorization")
 	if authHeader == "" {
-		respondWithError(w, http.StatusBadRequest,
-			"Authorization header required")
-		return id.Value, false
+		return id.Value, errors.New("Authorization header required")
 	}
 
 	// Check request is sending a bearer token
 	if !strings.HasPrefix(authHeader, BEARER_PREFIX) {
-		respondWithError(w, http.StatusBadRequest,
-			"Bearer token required")
-		return id.Value, false
+		return id.Value, errors.New("Bearer token required")
 	}
 
 	// Get token string
@@ -94,20 +91,23 @@ func checkTokenAndGetID(db *sql.DB, w http.ResponseWriter,
 	if err != nil {
 		switch err {
 		case sql.ErrNoRows:
-			respondWithError(w, http.StatusUnauthorized,
-				"The access token provided does not match any user")
+			return id.Value,
+				errors.New("The access token provided does not match any user")
 		default:
-			respondWithError(w, http.StatusInternalServerError, err.Error())
+			/* TODO: This is really an internal server error, implement a custom
+			** error type to return the correct HTTP code to respond to the user
+			 */
+			return id.Value, err
 		}
-		return id.Value, false
 	}
-	return id.Value, true
+	return id.Value, nil
 }
 
 /* Validate auth token and return user inventory */
 func (a *App) getInventory(w http.ResponseWriter, r *http.Request) {
-	id, valid := checkTokenAndGetID(a.DB, w, r)
-	if !valid {
+	id, err := getIDFromToken(a.DB, w, r)
+	if err != nil {
+		respondWithError(w, http.StatusUnauthorized, err.Error())
 		return
 	}
 	fmt.Printf("ID: %d\n", id)
