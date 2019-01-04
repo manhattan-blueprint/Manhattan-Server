@@ -213,7 +213,20 @@ func (a *App) addInventory(w http.ResponseWriter, r *http.Request) {
 	respondWithEmptyJSON(w, http.StatusOK)
 }
 
-/* Remove item(s) from user inventory */
+/* Remove all items from user inventory */
 func (a *App) removeInventory(w http.ResponseWriter, r *http.Request) {
-	respondWithError(w, http.StatusNotImplemented, "To be implemented")
+	id, err := getIDFromToken(a.DB, w, r)
+	if err != nil {
+		respondWithError(w, http.StatusUnauthorized, err.Error())
+		return
+	}
+
+	stmt := "DELETE FROM inventory WHERE user_id=?"
+	_, err = a.DB.Exec(stmt, id)
+	if err != nil {
+		respondWithError(w, http.StatusInternalServerError, err.Error())
+		return
+	}
+
+	respondWithEmptyJSON(w, http.StatusOK)
 }
