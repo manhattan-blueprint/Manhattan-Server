@@ -22,6 +22,15 @@ type ID struct {
 	Value uint32
 }
 
+type InventoryResponse struct {
+	Items []ItemResponse `json:"items"`
+}
+
+type ItemResponse struct {
+	ItemID   uint32 `json:"item_id"`
+	Quantity uint32 `json:"quantity"`
+}
+
 const BEARER_PREFIX string = "Bearer "
 
 /* Initialise database connection, mux router and routes */
@@ -135,11 +144,36 @@ func (a *App) getInventory(w http.ResponseWriter, r *http.Request) {
 		respondWithError(w, http.StatusUnauthorized, err.Error())
 		return
 	}
-	fmt.Printf("ID: %d\n", id)
 
-	// stmt := "SELECT item_id, quantity FROM inventory WHERE user_id=?"
+	stmt := "SELECT item_id, quantity FROM inventory WHERE user_id=?"
+	rows, err := a.DB.Query(stmt, id)
+	if err != nil {
+		respondWithError(w, http.StatusInternalServerError, err.Error())
+		return
+	}
 
-	respondWithError(w, http.StatusNotImplemented, "To be implemented")
+	// Convert result rows into inventory response structure
+	var invRes InventoryResponse
+	// Handle empty inventory case
+	invRes.Items = make([]ItemResponse, 0)
+	defer rows.Close()
+	for rows.Next() {
+		var itemRes ItemResponse
+		err = rows.Scan(&itemRes.ItemID, &itemRes.Quantity)
+		if err != nil {
+			respondWithError(w, http.StatusInternalServerError, err.Error())
+			return
+		}
+		invRes.Items = append(invRes.Items, itemRes)
+	}
+	// Handle any errors encountered during iteration
+	err = rows.Err()
+	if err != nil {
+		respondWithError(w, http.StatusInternalServerError, err.Error())
+		return
+	}
+
+	respondWithJSON(w, http.StatusOK, invRes)
 }
 
 /* Add item(s) to user inventory */

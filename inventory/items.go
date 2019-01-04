@@ -12,7 +12,7 @@ type Inventory struct {
 type Item struct {
 	UserID   uint32 `json:"user_id"`
 	ItemID   uint32 `json:"item_id"`
-	Quantity uint32 `json:"quantity`
+	Quantity uint32 `json:"quantity"`
 }
 
 /* Add a variable number of items to user inventory, checking if an entry
