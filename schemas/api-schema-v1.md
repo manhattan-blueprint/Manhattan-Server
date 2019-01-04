@@ -118,7 +118,7 @@ Code 200:
 Code 401:
 ```json
 {
-    "error":"Unauthorized auth token is invalid"
+    "error":"The access token provided does not match any user"
 }
 ```
 
@@ -147,14 +147,31 @@ Code 200:
 Code 400:
 ```json
 {
-    "error":"An item with this id does not exist"
+    "error":"Invalid item list"
 }
 ```
-
+or
+```json
+{
+    "error":"Empty item list"
+}
+```
+or
+```json
+{
+    "error":"Invalid item ID in list"
+}
+```
+or
+```json
+{
+    "error":"Invalid item quantity in list"
+}
+```
 Code 401:
 ```json
 {
-    "error":"Unauthorized auth token is invalid"
+    "error":"The access token provided does not match any user"
 }
 ```
 
@@ -170,7 +187,7 @@ Code 200:
 Code 401:
 ```json
 {
-    "error":"Unauthorized auth token is invalid"
+    "error":"The access token provided does not match any user"
 }
 ```
 
