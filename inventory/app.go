@@ -32,6 +32,7 @@ type ItemResponse struct {
 }
 
 const BEARER_PREFIX string = "Bearer "
+const MAX_ITEM_ID uint32 = 16
 
 /* Initialise database connection, mux router and routes */
 func (a *App) Initialise(dbUser, dbPassword, dbHost, dbName string) error {
@@ -127,7 +128,7 @@ func checkValidInventory(inv Inventory) error {
 		return errors.New("Empty item list")
 	}
 	for i := 0; i < len(inv.Items); i++ {
-		if inv.Items[i].ItemID <= 0 || inv.Items[i].ItemID > 16 {
+		if inv.Items[i].ItemID <= 0 || inv.Items[i].ItemID > MAX_ITEM_ID {
 			return errors.New("Invalid item ID in list")
 		}
 		if inv.Items[i].Quantity <= 0 {
