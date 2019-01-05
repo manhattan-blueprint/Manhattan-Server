@@ -118,20 +118,26 @@ Code 200:
 Code 401:
 ```json
 {
-    "error":"Unauthorized auth token is invalid"
+    "error":"The access token provided does not match any user"
 }
 ```
 
 ---
 `/inventory` (POST) <br>
-**Description**: Add item to inventory
+**Description**: Add item(s) to inventory
 
 **Request Contents**:
 
 Parameter | Type | Description
 ---|---|---
-item_id  | Int | The item collected
-quantity | Int | The quantity of item collected
+items | List | List of item_id, quantity pairs to add
+
+Where each list element has the following contents:
+
+Parameter | Type | Description
+---|---|---
+item_id  | Int | The item to add (1 - 16 inclusive)
+quantity | Int | Quantity of the item to add (1 or greater)
 
 **Response**: <br>
 Code 200:
@@ -141,14 +147,31 @@ Code 200:
 Code 400:
 ```json
 {
-    "error":"An item with this id does not exist"
+    "error":"Invalid item list"
 }
 ```
-
+or
+```json
+{
+    "error":"Empty item list"
+}
+```
+or
+```json
+{
+    "error":"Invalid item ID in list"
+}
+```
+or
+```json
+{
+    "error":"Invalid item quantity in list"
+}
+```
 Code 401:
 ```json
 {
-    "error":"Unauthorized auth token is invalid"
+    "error":"The access token provided does not match any user"
 }
 ```
 
@@ -164,7 +187,7 @@ Code 200:
 Code 401:
 ```json
 {
-    "error":"Unauthorized auth token is invalid"
+    "error":"The access token provided does not match any user"
 }
 ```
 

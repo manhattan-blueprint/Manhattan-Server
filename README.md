@@ -28,7 +28,7 @@ This configuration:
 * Assumes a MySQL server is hosted locally **not** within a Docker container
 * The database name is set to "blueprint"
 
-Note, the configuration file in the `inventory` and `resource` directories currently only specify the port to open. These will be updated to match the configuration above when the respective API calls are implemented.
+Note, the configuration file in the `resource` directory currently only specifies the port to open. This will be updated to match the configuration above when the respective API calls are implemented.
 
 ### Deployment
 
