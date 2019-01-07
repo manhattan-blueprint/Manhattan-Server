@@ -1,10 +1,10 @@
 # Blueprint Server API
 
-The base URL for the schema is `http://foo.com` <br>
+The base URL for the schema is `http://foo.com`<br>
 All endpoints must start with `/api/v1`<br>
-No POST parameters can be blank
+No POST or URL parameters can be blank<br>
 All requests, aside from Authentication, must contain the access token as a header
-`Authorization: Bearer <token>`. Where each token is a 64 character string.
+`Authorization: Bearer <token>`, where each token is a 64 character string
 
 # Authentication
 `/authenticate/register` (POST) <br>
@@ -178,6 +178,7 @@ Code 401:
 ---
 `/inventory` (DELETE)<br>
 **Description**: Delete all inventory items for user
+
 **Response**: <br>
 Code 200:
 ```json
@@ -194,11 +195,19 @@ Code 401:
 # Resources
 `/resources` (GET) <br>
 **Description**: Get resources within a radius
+
+**URL Parameters**:
+
+Parameter | Type | Description
+---|---|---
+lat  | Float | Latitude coordinate
+long | Float | Longitude coordinate
+
 **Response**: <br>
 Code 200:
 ```json
 {
-    "items": [
+    "spawns": [
         {
             "item_id": 1, 
             "location": {
@@ -220,10 +229,33 @@ Code 200:
 Code 400: 
 ```json
 {
-    "error":"Location provided is invalid"
+    "error":"Latitude and longitude parameters are required"
 }
 ```
-
+or
+```json
+{
+    "error":"Could not convert latitude to float"
+}
+```
+or
+```json
+{
+    "error":"Could not convert longitude to float"
+}
+```
+or
+```json
+{
+    "error":"Invalid latitude, must be between -90 and 90"
+}
+```
+or
+```json
+{
+    "error":"Invalid longitude, must be between -180 and 180"
+}
+```
 Code 401:
 ```json
 {
