@@ -6,11 +6,16 @@ import (
 )
 
 type Configuration struct {
-	Port       int    `json:"port"`
-	DBUsername string `json:"dbUsername"`
-	DBPassword string `json:"dbPassword"`
-	DBHost     string `json:"dbHost"`
-	DBName     string `json:"dbName"`
+	Port       int         `json:"port"`
+	DBUsername string      `json:"dbUsername"`
+	DBPassword string      `json:"dbPassword"`
+	DBHost     string      `json:"dbHost"`
+	DBName     string      `json:"dbName"`
+	Developers []Developer `json:"developers"`
+}
+
+type Developer struct {
+	Username string `json:"username"`
 }
 
 func GetConfiguration(fileName string) (Configuration, error) {

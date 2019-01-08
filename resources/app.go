@@ -5,9 +5,11 @@ import (
 	"encoding/json"
 	"errors"
 	"fmt"
+	"math/rand"
 	"net/http"
 	"strconv"
 	"strings"
+	"time"
 
 	_ "github.com/go-sql-driver/mysql"
 	"github.com/gorilla/mux"
@@ -22,27 +24,39 @@ type ID struct {
 	Value uint32
 }
 
-type ResourcesResponse struct {
-	Spawns []SpawnResponse `json:"spawns"`
+type Count struct {
+	Value int
 }
 
-type SpawnResponse struct {
-	ItemID   uint32           `json:"item_id"`
-	Location LocationResponse `json:"location"`
+type ResourcesResReq struct {
+	Spawns []SpawnResReq `json:"spawns"`
 }
 
-type LocationResponse struct {
+type SpawnResReq struct {
+	ItemID   uint32         `json:"item_id"`
+	Location LocationResReq `json:"location"`
+}
+
+type LocationResReq struct {
 	Latitude  float64 `json:"latitude"`
 	Longitude float64 `json:"longitude"`
 }
 
 const BEARER_PREFIX string = "Bearer "
+const MAX_ITEM_ID uint32 = 16
 
 // Radius to return resources from, in kilometres
 const RESOURCE_RADIUS int = 1
 
+// Developer account usernames
+var devs []Developer
+
+// Expiration in years, months, days
+var resourceExpire = [3]int{0, 1, 0}
+
 /* Initialise database connection, mux router and routes */
-func (a *App) Initialise(dbUser, dbPassword, dbHost, dbName string) error {
+func (a *App) Initialise(dbUser, dbPassword, dbHost, dbName string,
+	confDevs []Developer) error {
 	connectionString := fmt.Sprintf("%s:%s@tcp(%s)/%s", dbUser, dbPassword,
 		dbHost, dbName)
 	var err error
@@ -50,6 +64,7 @@ func (a *App) Initialise(dbUser, dbPassword, dbHost, dbName string) error {
 	if err != nil {
 		return err
 	}
+	devs = confDevs
 	a.Router = mux.NewRouter()
 	a.initialiseRoutes()
 	return nil
@@ -93,8 +108,7 @@ func respondWithEmptyJSON(w http.ResponseWriter, code int) {
 }
 
 /* Validate auth token and get user ID */
-func getIDFromToken(db *sql.DB, w http.ResponseWriter,
-	r *http.Request) (uint32, error) {
+func getIDFromToken(db *sql.DB, r *http.Request) (uint32, error) {
 	var id ID
 
 	// Get raw Authorization header
@@ -129,9 +143,72 @@ func getIDFromToken(db *sql.DB, w http.ResponseWriter,
 	return id.Value, nil
 }
 
+/* Validate username is a developer */
+func checkDeveloper(db *sql.DB, id uint32) error {
+	stmt := "SELECT username FROM account WHERE user_id=?"
+	var dev Developer
+	err := db.QueryRow(stmt, id).Scan(&dev.Username)
+	if err != nil {
+		return errors.New("User not found")
+	}
+
+	for i := 0; i < len(devs); i++ {
+		if devs[i].Username == dev.Username {
+			return nil
+		}
+	}
+	return errors.New("User must be a developer")
+}
+
+/* Check sent spawn list is valid */
+func checkValidResources(res ResourcesResReq) error {
+	if len(res.Spawns) <= 0 {
+		return errors.New("Empty spawn list")
+	}
+	for i := 0; i < len(res.Spawns); i++ {
+		if res.Spawns[i].ItemID <= 0 || res.Spawns[i].ItemID > MAX_ITEM_ID {
+			return errors.New("Invalid item ID in list")
+		}
+		err := checkValidLatLong(res.Spawns[i].Location.Latitude,
+			res.Spawns[i].Location.Longitude)
+		if err != nil {
+			return err
+		}
+	}
+	return nil
+}
+
+/* Check floats are valid latitude and longitude */
+func checkValidLatLong(lat, long float64) error {
+	if lat < -90 || lat > 90 {
+		return errors.New("Invalid latitude, must be between -90 and 90")
+	}
+	if long < -180 || lat > 180 {
+		return errors.New("Invalid longitude, must be between -180 and 180")
+	}
+	return nil
+}
+
+/* Generate a unique given target id in a given table */
+func generateID(db *sql.DB, table, targetID string) (uint32, error) {
+	seed := rand.NewSource(time.Now().UnixNano())
+	random := rand.New(seed)
+	stmt := fmt.Sprintf("SELECT COUNT(*) FROM %s WHERE %s=?", table, targetID)
+	var id uint32
+	idCount := Count{Value: 1}
+	for idCount.Value != 0 {
+		id = random.Uint32()
+		err := db.QueryRow(stmt, id).Scan(&idCount.Value)
+		if err != nil {
+			return id, err
+		}
+	}
+	return id, nil
+}
+
 /* Validate auth token and return resources within radius */
 func (a *App) getResources(w http.ResponseWriter, r *http.Request) {
-	_, err := getIDFromToken(a.DB, w, r)
+	_, err := getIDFromToken(a.DB, r)
 	if err != nil {
 		respondWithError(w, http.StatusUnauthorized, err.Error())
 		return
@@ -158,15 +235,9 @@ func (a *App) getResources(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	// Check latitude and longitude are valid
-	if lat < -90.0 || lat > 90.0 {
-		respondWithError(w, http.StatusBadRequest,
-			"Invalid latitude, must be between -90 and 90")
-		return
-	}
-	if long < -180.0 || lat > 180.0 {
-		respondWithError(w, http.StatusBadRequest,
-			"Invalid longitude, must be between -180 and 180")
+	err = checkValidLatLong(lat, long)
+	if err != nil {
+		respondWithError(w, http.StatusBadRequest, err.Error())
 		return
 	}
 
@@ -186,13 +257,13 @@ func (a *App) getResources(w http.ResponseWriter, r *http.Request) {
 	}
 
 	// Convert result rows into resources response structure
-	var resRes ResourcesResponse
+	var resRes ResourcesResReq
 	// Handle no resources case
-	resRes.Spawns = make([]SpawnResponse, 0)
+	resRes.Spawns = make([]SpawnResReq, 0)
 	defer rows.Close()
 	for rows.Next() {
-		var spawnRes SpawnResponse
-		var locRes LocationResponse
+		var spawnRes SpawnResReq
+		var locRes LocationResReq
 		err = rows.Scan(&spawnRes.ItemID, &locRes.Latitude, &locRes.Longitude)
 		if err != nil {
 			respondWithError(w, http.StatusInternalServerError, err.Error())
@@ -213,19 +284,68 @@ func (a *App) getResources(w http.ResponseWriter, r *http.Request) {
 
 /* Validate auth token, check user is developer and add resource(s) */
 func (a *App) addResources(w http.ResponseWriter, r *http.Request) {
-	id, err := getIDFromToken(a.DB, w, r)
+	id, err := getIDFromToken(a.DB, r)
 	if err != nil {
 		respondWithError(w, http.StatusUnauthorized, err.Error())
 		return
 	}
-	fmt.Printf("ID: %d\n", id)
 
-	respondWithError(w, http.StatusNotImplemented, "To be implemented")
+	err = checkDeveloper(a.DB, id)
+	if err != nil {
+		respondWithError(w, http.StatusUnauthorized, err.Error())
+		return
+	}
+
+	// Decode json body into resources request
+	decoder := json.NewDecoder(r.Body)
+	var resReq ResourcesResReq
+	err = decoder.Decode(&resReq)
+	if err != nil {
+		respondWithError(w, http.StatusBadRequest, "Invalid resources list")
+		return
+	}
+
+	err = checkValidResources(resReq)
+	if err != nil {
+		respondWithError(w, http.StatusBadRequest, err.Error())
+		return
+	}
+
+	// Convert resources request into database resources struct
+	var res Resources
+	for i := 0; i < len(resReq.Spawns); i++ {
+		var spawn Spawn
+		// Create a unique spawn_id
+		spawn.SpawnID, err = generateID(a.DB, "resources", "spawn_id")
+		if err != nil {
+			respondWithError(w, http.StatusInternalServerError, err.Error())
+			return
+		}
+
+		spawn.ItemID = resReq.Spawns[i].ItemID
+		spawn.GCSLat = resReq.Spawns[i].Location.Latitude
+		spawn.GCSLong = resReq.Spawns[i].Location.Longitude
+
+		// Change expiry
+		spawn.ResourceExpire = time.Now().AddDate(resourceExpire[0],
+			resourceExpire[1], resourceExpire[2]).UnixNano()
+
+		res.Spawns = append(res.Spawns, spawn)
+	}
+
+	// Query database
+	err = res.AddResources(a.DB)
+	if err != nil {
+		respondWithError(w, http.StatusInternalServerError, err.Error())
+		return
+	}
+
+	respondWithEmptyJSON(w, http.StatusOK)
 }
 
 /* Validate auth token, check user is developer and remove resource(s) */
 func (a *App) removeResources(w http.ResponseWriter, r *http.Request) {
-	id, err := getIDFromToken(a.DB, w, r)
+	id, err := getIDFromToken(a.DB, r)
 	if err != nil {
 		respondWithError(w, http.StatusUnauthorized, err.Error())
 		return
