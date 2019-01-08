@@ -86,8 +86,7 @@ func respondWithEmptyJSON(w http.ResponseWriter, code int) {
 }
 
 /* Validate auth token and get user ID */
-func getIDFromToken(db *sql.DB, w http.ResponseWriter,
-	r *http.Request) (uint32, error) {
+func getIDFromToken(db *sql.DB, r *http.Request) (uint32, error) {
 	var id ID
 
 	// Get raw Authorization header
@@ -140,7 +139,7 @@ func checkValidInventory(inv Inventory) error {
 
 /* Return user inventory */
 func (a *App) getInventory(w http.ResponseWriter, r *http.Request) {
-	id, err := getIDFromToken(a.DB, w, r)
+	id, err := getIDFromToken(a.DB, r)
 	if err != nil {
 		respondWithError(w, http.StatusUnauthorized, err.Error())
 		return
@@ -179,7 +178,7 @@ func (a *App) getInventory(w http.ResponseWriter, r *http.Request) {
 
 /* Add item(s) to user inventory */
 func (a *App) addInventory(w http.ResponseWriter, r *http.Request) {
-	id, err := getIDFromToken(a.DB, w, r)
+	id, err := getIDFromToken(a.DB, r)
 	if err != nil {
 		respondWithError(w, http.StatusUnauthorized, err.Error())
 		return
@@ -209,6 +208,7 @@ func (a *App) addInventory(w http.ResponseWriter, r *http.Request) {
 	err = inv.AddInventory(a.DB)
 	if err != nil {
 		respondWithError(w, http.StatusInternalServerError, err.Error())
+		return
 	}
 
 	respondWithEmptyJSON(w, http.StatusOK)
@@ -216,7 +216,7 @@ func (a *App) addInventory(w http.ResponseWriter, r *http.Request) {
 
 /* Remove all items from user inventory */
 func (a *App) removeInventory(w http.ResponseWriter, r *http.Request) {
-	id, err := getIDFromToken(a.DB, w, r)
+	id, err := getIDFromToken(a.DB, r)
 	if err != nil {
 		respondWithError(w, http.StatusUnauthorized, err.Error())
 		return

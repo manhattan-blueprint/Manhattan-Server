@@ -22,6 +22,10 @@ type App struct {
 	DB     *sql.DB
 }
 
+type Count struct {
+	Value int
+}
+
 type AccountRequest struct {
 	Username string `json:"username"`
 	Password string `json:"password"`
@@ -34,10 +38,6 @@ type TokenRequest struct {
 type TokenResponse struct {
 	Access  string `json:"access"`
 	Refresh string `json:"refresh"`
-}
-
-type Count struct {
-	Value int
 }
 
 const TOKEN_SIZE int = 64
@@ -90,7 +90,7 @@ func respondWithJSON(w http.ResponseWriter, code int, payload interface{}) {
 }
 
 /* Generate a unique given target id in a given table */
-func generateID(db *sql.DB, table string, targetID string) (uint32, error) {
+func generateID(db *sql.DB, table, targetID string) (uint32, error) {
 	seed := mrand.NewSource(time.Now().UnixNano())
 	random := mrand.New(seed)
 	stmt := fmt.Sprintf("SELECT COUNT(*) FROM %s WHERE %s=?", table, targetID)
