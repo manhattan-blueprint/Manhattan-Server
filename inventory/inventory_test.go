@@ -17,10 +17,10 @@ type Count struct {
 	Value int
 }
 
+const ACCESS_TOKEN string = "Bearer ydzvGQg2EcjTTHLSVHb7JTpkSRDdd0hQu2n5YPEM4CTfnqQIrqnufSIIOWchPNSZ"
+
 var testA App
 var testConfig Configuration
-
-const ACCESS_TOKEN string = "Bearer ydzvGQg2EcjTTHLSVHb7JTpkSRDdd0hQu2n5YPEM4CTfnqQIrqnufSIIOWchPNSZ"
 
 func TestMain(m *testing.M) {
 	fmt.Println("hello inventory test")
