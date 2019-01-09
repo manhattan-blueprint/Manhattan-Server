@@ -350,7 +350,45 @@ func (a *App) removeResources(w http.ResponseWriter, r *http.Request) {
 		respondWithError(w, http.StatusUnauthorized, err.Error())
 		return
 	}
-	fmt.Printf("ID: %d\n", id)
 
-	respondWithError(w, http.StatusNotImplemented, "To be implemented")
+	err = checkDeveloper(a.DB, id)
+	if err != nil {
+		respondWithError(w, http.StatusUnauthorized, err.Error())
+		return
+	}
+
+	// Decode json body into resources request
+	decoder := json.NewDecoder(r.Body)
+	var resReq ResourcesResReq
+	err = decoder.Decode(&resReq)
+	if err != nil {
+		respondWithError(w, http.StatusBadRequest, "Invalid resources list")
+		return
+	}
+
+	err = checkValidResources(resReq)
+	if err != nil {
+		respondWithError(w, http.StatusBadRequest, err.Error())
+		return
+	}
+
+	stmt := "DELETE FROM resources WHERE (item_id, gcs_lat, gcs_long) IN ("
+	values := []interface{}{}
+	for i := 0; i < len(resReq.Spawns); i++ {
+		stmt += "(?, ?, ?), "
+		values = append(values, resReq.Spawns[i].ItemID,
+			resReq.Spawns[i].Location.Latitude,
+			resReq.Spawns[i].Location.Longitude)
+	}
+	// Remove the trailing space and comma, and add closing parenthesis
+	stmt = strings.TrimSuffix(stmt, ", ")
+	stmt += ")"
+
+	_, err = a.DB.Exec(stmt, values...)
+	if err != nil {
+		respondWithError(w, http.StatusInternalServerError, err.Error())
+		return
+	}
+
+	respondWithEmptyJSON(w, http.StatusOK)
 }
