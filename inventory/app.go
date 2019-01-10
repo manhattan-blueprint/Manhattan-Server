@@ -57,11 +57,11 @@ func (a *App) Run(port int) error {
 func (a *App) initialiseRoutes() {
 	prefix := "/api/v1"
 	a.Router.HandleFunc(fmt.Sprintf("%s/inventory", prefix),
-		a.getInventory).Methods("GET")
+		a.getInventory).Methods(http.MethodGet)
 	a.Router.HandleFunc(fmt.Sprintf("%s/inventory", prefix),
-		a.addInventory).Methods("POST")
+		a.addInventory).Methods(http.MethodPost)
 	a.Router.HandleFunc(fmt.Sprintf("%s/inventory", prefix),
-		a.removeInventory).Methods("DELETE")
+		a.removeInventory).Methods(http.MethodDelete)
 }
 
 /* Respond with a error JSON */

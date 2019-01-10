@@ -87,7 +87,7 @@ func TestGetMissingParameters(t *testing.T) {
 	clearResourcesTable(t)
 
 	// No URL parameters
-	req, err := http.NewRequest("GET", "/api/v1/resources", nil)
+	req, err := http.NewRequest(http.MethodGet, "/api/v1/resources", nil)
 	req.Header.Set("Authorization", NORMAL_ACCESS_TOKEN)
 	if err != nil {
 		t.Errorf("Failed to create request")
@@ -97,7 +97,8 @@ func TestGetMissingParameters(t *testing.T) {
 	checkResponseCode(t, http.StatusBadRequest, res.Code)
 
 	// Irrelevant URL parameters
-	req, err = http.NewRequest("GET", "/api/v1/resources?animal=duck", nil)
+	req, err = http.NewRequest(http.MethodGet, "/api/v1/resources?animal=duck",
+		nil)
 	req.Header.Set("Authorization", NORMAL_ACCESS_TOKEN)
 	if err != nil {
 		t.Errorf("Failed to create request")
@@ -107,7 +108,8 @@ func TestGetMissingParameters(t *testing.T) {
 	checkResponseCode(t, http.StatusBadRequest, res.Code)
 
 	// Missing longitude parameter
-	req, err = http.NewRequest("GET", "/api/v1/resources?lat=50.123456", nil)
+	req, err = http.NewRequest(http.MethodGet,
+		"/api/v1/resources?lat=50.123456", nil)
 	req.Header.Set("Authorization", NORMAL_ACCESS_TOKEN)
 	if err != nil {
 		t.Errorf("Failed to create request")
@@ -117,7 +119,8 @@ func TestGetMissingParameters(t *testing.T) {
 	checkResponseCode(t, http.StatusBadRequest, res.Code)
 
 	// Missing latitude parameter
-	req, err = http.NewRequest("GET", "/api/v1/resources?long=-1.123456", nil)
+	req, err = http.NewRequest(http.MethodGet,
+		"/api/v1/resources?long=-1.123456", nil)
 	req.Header.Set("Authorization", NORMAL_ACCESS_TOKEN)
 	if err != nil {
 		t.Errorf("Failed to create request")
@@ -133,8 +136,8 @@ func TestGetInvalidParameters(t *testing.T) {
 	clearResourcesTable(t)
 
 	// Latitude and longitude must be numeric
-	req, err := http.NewRequest("GET", "/api/v1/resources?lat=will&long=smith",
-		nil)
+	req, err := http.NewRequest(http.MethodGet,
+		"/api/v1/resources?lat=will&long=smith", nil)
 	req.Header.Set("Authorization", NORMAL_ACCESS_TOKEN)
 	if err != nil {
 		t.Errorf("Failed to create request")
@@ -144,8 +147,8 @@ func TestGetInvalidParameters(t *testing.T) {
 	checkResponseCode(t, http.StatusBadRequest, res.Code)
 
 	// Latitude must be between -90 and 90 inclusive
-	req, err = http.NewRequest("GET", "/api/v1/resources?lat=-91&long=0",
-		nil)
+	req, err = http.NewRequest(http.MethodGet,
+		"/api/v1/resources?lat=-91&long=0", nil)
 	req.Header.Set("Authorization", NORMAL_ACCESS_TOKEN)
 	if err != nil {
 		t.Errorf("Failed to create request")
@@ -154,8 +157,8 @@ func TestGetInvalidParameters(t *testing.T) {
 	res = executeRequest(req)
 	checkResponseCode(t, http.StatusBadRequest, res.Code)
 
-	req, err = http.NewRequest("GET", "/api/v1/resources?lat=91&long=0",
-		nil)
+	req, err = http.NewRequest(http.MethodGet,
+		"/api/v1/resources?lat=91&long=0", nil)
 	req.Header.Set("Authorization", NORMAL_ACCESS_TOKEN)
 	if err != nil {
 		t.Errorf("Failed to create request")
@@ -165,8 +168,8 @@ func TestGetInvalidParameters(t *testing.T) {
 	checkResponseCode(t, http.StatusBadRequest, res.Code)
 
 	// Longitude must be between -180 and 180 inclusive
-	req, err = http.NewRequest("GET", "/api/v1/resources?lat=0&long=-181",
-		nil)
+	req, err = http.NewRequest(http.MethodGet,
+		"/api/v1/resources?lat=0&long=-181", nil)
 	req.Header.Set("Authorization", NORMAL_ACCESS_TOKEN)
 	if err != nil {
 		t.Errorf("Failed to create request")
@@ -175,8 +178,8 @@ func TestGetInvalidParameters(t *testing.T) {
 	res = executeRequest(req)
 	checkResponseCode(t, http.StatusBadRequest, res.Code)
 
-	req, err = http.NewRequest("GET", "/api/v1/resources?lat=0&long=181",
-		nil)
+	req, err = http.NewRequest(http.MethodGet,
+		"/api/v1/resources?lat=0&long=181", nil)
 	req.Header.Set("Authorization", NORMAL_ACCESS_TOKEN)
 	if err != nil {
 		t.Errorf("Failed to create request")
@@ -191,7 +194,7 @@ func TestGetInvalidParameters(t *testing.T) {
 func TestGetEmptyResources(t *testing.T) {
 	clearResourcesTable(t)
 
-	req, err := http.NewRequest("GET",
+	req, err := http.NewRequest(http.MethodGet,
 		"/api/v1/resources?lat=51.4560&long=2.6030", nil)
 	req.Header.Set("Authorization", NORMAL_ACCESS_TOKEN)
 	if err != nil {
@@ -221,7 +224,7 @@ func TestAddGetResourcesWithinRadius(t *testing.T) {
 	// Add resource
 	payload := []byte(`{"spawns":[{"item_id":5,"location":{"latitude":51.456061,"longitude":-2.603104}}]}`)
 
-	req, err := http.NewRequest("POST", "/api/v1/resources",
+	req, err := http.NewRequest(http.MethodPost, "/api/v1/resources",
 		bytes.NewBuffer(payload))
 	req.Header.Set("Authorization", DEV_ACCESS_TOKEN)
 	if err != nil {
@@ -231,7 +234,7 @@ func TestAddGetResourcesWithinRadius(t *testing.T) {
 	res := executeRequest(req)
 	checkResponseCode(t, http.StatusOK, res.Code)
 
-	req, err = http.NewRequest("GET",
+	req, err = http.NewRequest(http.MethodGet,
 		"/api/v1/resources?lat=51.456825&long=-2.601893", nil)
 	req.Header.Set("Authorization", NORMAL_ACCESS_TOKEN)
 	if err != nil {
@@ -275,7 +278,7 @@ func TestAddGetResourcesOutsideRadius(t *testing.T) {
 	// Add resource
 	payload := []byte(`{"spawns":[{"item_id":5,"location":{"latitude":51.456061,"longitude":-2.603104}}]}`)
 
-	req, err := http.NewRequest("POST", "/api/v1/resources",
+	req, err := http.NewRequest(http.MethodPost, "/api/v1/resources",
 		bytes.NewBuffer(payload))
 	req.Header.Set("Authorization", DEV_ACCESS_TOKEN)
 	if err != nil {
@@ -285,7 +288,7 @@ func TestAddGetResourcesOutsideRadius(t *testing.T) {
 	res := executeRequest(req)
 	checkResponseCode(t, http.StatusOK, res.Code)
 
-	req, err = http.NewRequest("GET",
+	req, err = http.NewRequest(http.MethodGet,
 		"/api/v1/resources?lat=51.464514&long=-2.609992", nil)
 	req.Header.Set("Authorization", NORMAL_ACCESS_TOKEN)
 	if err != nil {
@@ -315,7 +318,7 @@ func TestAddGetMultipleResources(t *testing.T) {
 	// Add resource
 	payload := []byte(`{"spawns":[{"item_id":1,"location":{"latitude":51.456061,"longitude":-2.603104}},{"item_id":2,"location":{"latitude":51.454244,"longitude":-2.607209}},{"item_id":3,"location":{"latitude":51.472149,"longitude":-2.625381}},{"item_id":4,"location":{"latitude":51.449645,"longitude":-2.581146}}]}`)
 
-	req, err := http.NewRequest("POST", "/api/v1/resources",
+	req, err := http.NewRequest(http.MethodPost, "/api/v1/resources",
 		bytes.NewBuffer(payload))
 	req.Header.Set("Authorization", DEV_ACCESS_TOKEN)
 	if err != nil {
@@ -325,7 +328,7 @@ func TestAddGetMultipleResources(t *testing.T) {
 	res := executeRequest(req)
 	checkResponseCode(t, http.StatusOK, res.Code)
 
-	req, err = http.NewRequest("GET",
+	req, err = http.NewRequest(http.MethodGet,
 		"/api/v1/resources?lat=51.456112&long=-2.605962", nil)
 	req.Header.Set("Authorization", NORMAL_ACCESS_TOKEN)
 	if err != nil {
@@ -361,7 +364,7 @@ func TestAddRemoveOnlyDeveloper(t *testing.T) {
 	// Add resource with a normal account
 	payload := []byte(`{"spawns":[{"item_id":5,"location":{"latitude":51.456061,"longitude":-2.603104}}]}`)
 
-	req, err := http.NewRequest("POST", "/api/v1/resources",
+	req, err := http.NewRequest(http.MethodPost, "/api/v1/resources",
 		bytes.NewBuffer(payload))
 	req.Header.Set("Authorization", NORMAL_ACCESS_TOKEN)
 	if err != nil {
@@ -372,7 +375,7 @@ func TestAddRemoveOnlyDeveloper(t *testing.T) {
 	checkResponseCode(t, http.StatusUnauthorized, res.Code)
 
 	// Add resource with developer account
-	req, err = http.NewRequest("POST", "/api/v1/resources",
+	req, err = http.NewRequest(http.MethodPost, "/api/v1/resources",
 		bytes.NewBuffer(payload))
 	req.Header.Set("Authorization", DEV_ACCESS_TOKEN)
 	if err != nil {
@@ -383,7 +386,7 @@ func TestAddRemoveOnlyDeveloper(t *testing.T) {
 	checkResponseCode(t, http.StatusOK, res.Code)
 
 	// Remove resource with normal account
-	req, err = http.NewRequest("DELETE", "/api/v1/resources",
+	req, err = http.NewRequest(http.MethodDelete, "/api/v1/resources",
 		bytes.NewBuffer(payload))
 	req.Header.Set("Authorization", NORMAL_ACCESS_TOKEN)
 	if err != nil {
@@ -394,7 +397,7 @@ func TestAddRemoveOnlyDeveloper(t *testing.T) {
 	checkResponseCode(t, http.StatusUnauthorized, res.Code)
 
 	// Remove resource with developer account
-	req, err = http.NewRequest("DELETE", "/api/v1/resources",
+	req, err = http.NewRequest(http.MethodDelete, "/api/v1/resources",
 		bytes.NewBuffer(payload))
 	req.Header.Set("Authorization", DEV_ACCESS_TOKEN)
 	if err != nil {
@@ -412,7 +415,7 @@ func TestAddRemoveEmptyResources(t *testing.T) {
 	payload := []byte(`{"spawns":[]}`)
 
 	// Add
-	req, err := http.NewRequest("POST", "/api/v1/resources",
+	req, err := http.NewRequest(http.MethodPost, "/api/v1/resources",
 		bytes.NewBuffer(payload))
 	req.Header.Set("Authorization", DEV_ACCESS_TOKEN)
 	if err != nil {
@@ -423,7 +426,7 @@ func TestAddRemoveEmptyResources(t *testing.T) {
 	checkResponseCode(t, http.StatusBadRequest, res.Code)
 
 	// Remove
-	req, err = http.NewRequest("DELETE", "/api/v1/resources",
+	req, err = http.NewRequest(http.MethodDelete, "/api/v1/resources",
 		bytes.NewBuffer(payload))
 	req.Header.Set("Authorization", DEV_ACCESS_TOKEN)
 	if err != nil {
@@ -442,7 +445,7 @@ func TestAddRemoveInvalidItemID(t *testing.T) {
 	payload := []byte(`{"spawns":[{"item_id":17,"location":{"latitude":51.456061,"longitude":-2.603104}}]}`)
 
 	// Add
-	req, err := http.NewRequest("POST", "/api/v1/resources",
+	req, err := http.NewRequest(http.MethodPost, "/api/v1/resources",
 		bytes.NewBuffer(payload))
 	req.Header.Set("Authorization", DEV_ACCESS_TOKEN)
 	if err != nil {
@@ -453,7 +456,7 @@ func TestAddRemoveInvalidItemID(t *testing.T) {
 	checkResponseCode(t, http.StatusBadRequest, res.Code)
 
 	// Remove
-	req, err = http.NewRequest("DELETE", "/api/v1/resources",
+	req, err = http.NewRequest(http.MethodDelete, "/api/v1/resources",
 		bytes.NewBuffer(payload))
 	req.Header.Set("Authorization", DEV_ACCESS_TOKEN)
 	if err != nil {
@@ -474,7 +477,7 @@ func TestAddRemoveInvalidLatLong(t *testing.T) {
 	payload := []byte(`{"spawns":[{"item_id":5,"location":{"latitude":151.456061,"longitude":-2.603104}}]}`)
 
 	// Add
-	req, err := http.NewRequest("POST", "/api/v1/resources",
+	req, err := http.NewRequest(http.MethodPost, "/api/v1/resources",
 		bytes.NewBuffer(payload))
 	req.Header.Set("Authorization", DEV_ACCESS_TOKEN)
 	if err != nil {
@@ -485,7 +488,7 @@ func TestAddRemoveInvalidLatLong(t *testing.T) {
 	checkResponseCode(t, http.StatusBadRequest, res.Code)
 
 	// Remove
-	req, err = http.NewRequest("DELETE", "/api/v1/resources",
+	req, err = http.NewRequest(http.MethodDelete, "/api/v1/resources",
 		bytes.NewBuffer(payload))
 	req.Header.Set("Authorization", DEV_ACCESS_TOKEN)
 	if err != nil {
@@ -499,7 +502,7 @@ func TestAddRemoveInvalidLatLong(t *testing.T) {
 	payload = []byte(`{"spawns":[{"item_id":5,"location":{"latitude":51.456061,"longitude":-182.603104}}]}`)
 
 	// Add
-	req, err = http.NewRequest("POST", "/api/v1/resources",
+	req, err = http.NewRequest(http.MethodPost, "/api/v1/resources",
 		bytes.NewBuffer(payload))
 	req.Header.Set("Authorization", DEV_ACCESS_TOKEN)
 	if err != nil {
@@ -510,7 +513,7 @@ func TestAddRemoveInvalidLatLong(t *testing.T) {
 	checkResponseCode(t, http.StatusBadRequest, res.Code)
 
 	// Remove
-	req, err = http.NewRequest("DELETE", "/api/v1/resources",
+	req, err = http.NewRequest(http.MethodDelete, "/api/v1/resources",
 		bytes.NewBuffer(payload))
 	req.Header.Set("Authorization", DEV_ACCESS_TOKEN)
 	if err != nil {
@@ -528,7 +531,7 @@ func TestRemoveResource(t *testing.T) {
 	payload := []byte(`{"spawns":[{"item_id":5,"location":{"latitude":51.456061,"longitude":-2.603104}}]}`)
 
 	// Add
-	req, err := http.NewRequest("POST", "/api/v1/resources",
+	req, err := http.NewRequest(http.MethodPost, "/api/v1/resources",
 		bytes.NewBuffer(payload))
 	req.Header.Set("Authorization", DEV_ACCESS_TOKEN)
 	if err != nil {
@@ -539,7 +542,7 @@ func TestRemoveResource(t *testing.T) {
 	checkResponseCode(t, http.StatusOK, res.Code)
 
 	// Remove
-	req, err = http.NewRequest("DELETE", "/api/v1/resources",
+	req, err = http.NewRequest(http.MethodDelete, "/api/v1/resources",
 		bytes.NewBuffer(payload))
 	req.Header.Set("Authorization", DEV_ACCESS_TOKEN)
 	if err != nil {
@@ -550,7 +553,7 @@ func TestRemoveResource(t *testing.T) {
 	checkResponseCode(t, http.StatusOK, res.Code)
 
 	// Get
-	req, err = http.NewRequest("GET",
+	req, err = http.NewRequest(http.MethodGet,
 		"/api/v1/resources?lat=51.456061&long=-2.603104", nil)
 	req.Header.Set("Authorization", NORMAL_ACCESS_TOKEN)
 	if err != nil {

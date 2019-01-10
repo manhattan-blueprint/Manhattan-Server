@@ -88,7 +88,7 @@ func checkResponseCode(t *testing.T, expected, actual int) {
 func TestInvalidHeader(t *testing.T) {
 	clearInventoryTable(t)
 
-	req, err := http.NewRequest("GET", "/api/v1/inventory", nil)
+	req, err := http.NewRequest(http.MethodGet, "/api/v1/inventory", nil)
 	// Header key field must be set to 'Authorization'
 	req.Header.Set("Auth", ACCESS_TOKEN)
 	if err != nil {
@@ -109,7 +109,7 @@ func TestInvalidHeader(t *testing.T) {
 func TestIncorrectToken(t *testing.T) {
 	clearInventoryTable(t)
 
-	req, err := http.NewRequest("GET", "/api/v1/inventory", nil)
+	req, err := http.NewRequest(http.MethodGet, "/api/v1/inventory", nil)
 	req.Header.Set("Authorization",
 		"Bearer ydzvGQg2EcjTTHLSVHb7JTpkSRDdd0hQu2n5YPEM4CTfnqQIrqnufSIIOWchPNSA")
 	if err != nil {
@@ -124,7 +124,7 @@ func TestIncorrectToken(t *testing.T) {
 func TestGetEmptyInventory(t *testing.T) {
 	clearInventoryTable(t)
 
-	req, err := http.NewRequest("GET", "/api/v1/inventory", nil)
+	req, err := http.NewRequest(http.MethodGet, "/api/v1/inventory", nil)
 	req.Header.Set("Authorization", ACCESS_TOKEN)
 	if err != nil {
 		t.Errorf("Failed to create request")
@@ -152,7 +152,7 @@ func TestAddGetInventory(t *testing.T) {
 	// Add items to inventory
 	payload := []byte(`{"items":[{"item_id":1,"quantity":4},{"item_id":9,"quantity":5}]}`)
 
-	req, err := http.NewRequest("POST", "/api/v1/inventory",
+	req, err := http.NewRequest(http.MethodPost, "/api/v1/inventory",
 		bytes.NewBuffer(payload))
 	req.Header.Set("Authorization", ACCESS_TOKEN)
 	if err != nil {
@@ -163,7 +163,7 @@ func TestAddGetInventory(t *testing.T) {
 	checkResponseCode(t, http.StatusOK, res.Code)
 
 	// Get items from inventory
-	req, err = http.NewRequest("GET", "/api/v1/inventory", nil)
+	req, err = http.NewRequest(http.MethodGet, "/api/v1/inventory", nil)
 	req.Header.Set("Authorization", ACCESS_TOKEN)
 	if err != nil {
 		t.Errorf("Failed to create request")
@@ -198,7 +198,7 @@ func TestAddEmptyInventory(t *testing.T) {
 
 	payload := []byte(`{"items":[]}`)
 
-	req, err := http.NewRequest("POST", "/api/v1/inventory",
+	req, err := http.NewRequest(http.MethodPost, "/api/v1/inventory",
 		bytes.NewBuffer(payload))
 	req.Header.Set("Authorization", ACCESS_TOKEN)
 	if err != nil {
@@ -216,7 +216,7 @@ func TestAddInvalidItemID(t *testing.T) {
 	// Item IDs must be greater than 0 and less than or equal 16
 	payload := []byte(`{"items":[{"item_id":0,"quantity":4}]}`)
 
-	req, err := http.NewRequest("POST", "/api/v1/inventory",
+	req, err := http.NewRequest(http.MethodPost, "/api/v1/inventory",
 		bytes.NewBuffer(payload))
 	req.Header.Set("Authorization", ACCESS_TOKEN)
 	if err != nil {
@@ -228,7 +228,7 @@ func TestAddInvalidItemID(t *testing.T) {
 
 	payload = []byte(`{"items":[{"item_id":17,"quantity":4}]}`)
 
-	req, err = http.NewRequest("POST", "/api/v1/inventory",
+	req, err = http.NewRequest(http.MethodPost, "/api/v1/inventory",
 		bytes.NewBuffer(payload))
 	req.Header.Set("Authorization", ACCESS_TOKEN)
 	if err != nil {
@@ -246,7 +246,7 @@ func TestAddInvalidQuantity(t *testing.T) {
 
 	payload := []byte(`{"items":[{"item_id":1,"quantity":0}]}`)
 
-	req, err := http.NewRequest("POST", "/api/v1/inventory",
+	req, err := http.NewRequest(http.MethodPost, "/api/v1/inventory",
 		bytes.NewBuffer(payload))
 	req.Header.Set("Authorization", ACCESS_TOKEN)
 	if err != nil {
@@ -258,7 +258,7 @@ func TestAddInvalidQuantity(t *testing.T) {
 
 	payload = []byte(`{"items":[{"item_id":1,"quantity":-1}]}`)
 
-	req, err = http.NewRequest("POST", "/api/v1/inventory",
+	req, err = http.NewRequest(http.MethodPost, "/api/v1/inventory",
 		bytes.NewBuffer(payload))
 	req.Header.Set("Authorization", ACCESS_TOKEN)
 	if err != nil {
@@ -275,7 +275,7 @@ func TestDeleteInventory(t *testing.T) {
 	// Add items to inventory
 	payload := []byte(`{"items":[{"item_id":1,"quantity":4},{"item_id":9,"quantity":5}]}`)
 
-	req, err := http.NewRequest("POST", "/api/v1/inventory",
+	req, err := http.NewRequest(http.MethodPost, "/api/v1/inventory",
 		bytes.NewBuffer(payload))
 	req.Header.Set("Authorization", ACCESS_TOKEN)
 	if err != nil {
@@ -286,7 +286,7 @@ func TestDeleteInventory(t *testing.T) {
 	checkResponseCode(t, http.StatusOK, res.Code)
 
 	// Delete items from inventory
-	req, err = http.NewRequest("DELETE", "/api/v1/inventory", nil)
+	req, err = http.NewRequest(http.MethodDelete, "/api/v1/inventory", nil)
 	req.Header.Set("Authorization", ACCESS_TOKEN)
 	if err != nil {
 		t.Errorf("Failed to create request")
@@ -296,7 +296,7 @@ func TestDeleteInventory(t *testing.T) {
 	checkResponseCode(t, http.StatusOK, res.Code)
 
 	// Get the empty inventory
-	req, err = http.NewRequest("GET", "/api/v1/inventory", nil)
+	req, err = http.NewRequest(http.MethodGet, "/api/v1/inventory", nil)
 	req.Header.Set("Authorization", ACCESS_TOKEN)
 	if err != nil {
 		t.Errorf("Failed to create request")

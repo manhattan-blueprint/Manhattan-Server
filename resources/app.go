@@ -79,11 +79,11 @@ func (a *App) Run(port int) error {
 func (a *App) initialiseRoutes() {
 	prefix := "/api/v1"
 	a.Router.HandleFunc(fmt.Sprintf("%s/resources", prefix),
-		a.getResources).Methods("GET")
+		a.getResources).Methods(http.MethodGet)
 	a.Router.HandleFunc(fmt.Sprintf("%s/resources", prefix),
-		a.addResources).Methods("POST")
+		a.addResources).Methods(http.MethodPost)
 	a.Router.HandleFunc(fmt.Sprintf("%s/resources", prefix),
-		a.removeResources).Methods("DELETE")
+		a.removeResources).Methods(http.MethodDelete)
 }
 
 /* Respond with a error JSON */
