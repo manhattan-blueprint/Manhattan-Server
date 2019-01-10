@@ -1,12 +1,17 @@
 # Blueprint Server API
 
-The base URL for the schema is `http://foo.com`<br>
-All endpoints must start with `/api/v1`<br>
-No POST or URL parameters can be blank<br>
-All requests, aside from Authentication, must contain the access token as a header
+* The base URL for the schema is `http://smithwjv.ddns.net`
+* A port must be specified for each service
+  * 8000 for authenticate
+  * 8001 for inventory
+  * 8002 for resources
+* All endpoints must start with `/api/v1`
+* No POST or URL parameters can be blank
+* All requests, aside from Authentication, must contain the access token as a header
 `Authorization: Bearer <token>`, where each token is a 64 character string
 
 # Authentication
+
 `/authenticate/register` (POST) <br>
 **Description**: Create a new user and get auth tokens
 
@@ -211,15 +216,15 @@ Code 200:
         {
             "item_id": 1, 
             "location": {
-                "latitude": 123.456, 
-                "longitude": 123.678
+                "latitude": 50.12345678, 
+                "longitude": -2.61234567
             }  
         },
         {
             "item_id": 2, 
             "location": {
-                "latitude": 123.467, 
-                "longitude": 123.688
+                "latitude": 50.87654321, 
+                "longitude": -2.67654321
             }  
         }
     ]
@@ -259,6 +264,220 @@ or
 Code 401:
 ```json
 {
-    "error":"Unauthorized auth token is invalid"
+    "error":"The access token provided does not match any user"
+}
+```
+
+---
+`/resources` (POST) <br>
+**Description**: Add resource(s), from a developer account
+
+**Request Contents**:
+
+Parameter | Type | Description
+---|---|---
+spawns | List | List of item_id, location pairs to add
+
+Where each list element has the following contents:
+
+Parameter | Type | Description
+---|---|---
+item_id  | Int | The item to add (1 - 16 inclusive)
+location | Object | The location of the item to add
+
+Where the location object has the following contents:
+
+Parameter | Type | Description
+---|---|---
+Latitude  | Float | Latitude coordinate
+Longitude | Float | Longitude coordinate
+
+Example:
+
+```json
+{
+    "spawns": [
+        {
+            "item_id": 1, 
+            "location": {
+                "latitude": 50.12345678, 
+                "longitude": -2.61234567
+            }  
+        },
+        {
+            "item_id": 2, 
+            "location": {
+                "latitude": 50.87654321, 
+                "longitude": -2.67654321
+            }  
+        }
+    ]
+}
+```
+
+**Response**: <br>
+Code 200:
+```json
+{}
+```
+Code 400:
+```json
+{
+    "error":"Invalid spawn list"
+}
+```
+or
+```json
+{
+    "error":"Empty spawn list"
+}
+```
+or
+```json
+{
+    "error":"Invalid item ID in list"
+}
+```
+or
+```json
+{
+    "error":"Could not convert latitude to float"
+}
+```
+or
+```json
+{
+    "error":"Could not convert longitude to float"
+}
+```
+or
+```json
+{
+    "error":"Invalid latitude, must be between -90 and 90"
+}
+```
+or
+```json
+{
+    "error":"Invalid longitude, must be between -180 and 180"
+}
+```
+Code 401:
+```json
+{
+    "error":"The access token provided does not match any user"
+}
+```
+or
+```json
+{
+    "error":"User must be a developer"
+}
+```
+
+---
+`/resources` (DELETE)<br>
+**Description**: Remove resource(s), from a developer account
+
+**Request Contents**:
+
+Parameter | Type | Description
+---|---|---
+spawns | List | List of item_id, location pairs to add
+
+Where each list element has the following contents:
+
+Parameter | Type | Description
+---|---|---
+item_id  | Int | The item to add (1 - 16 inclusive)
+location | Object | The location of the item to add
+
+Where the location object has the following contents:
+
+Parameter | Type | Description
+---|---|---
+Latitude  | Float | Latitude coordinate
+Longitude | Float | Longitude coordinate
+
+Example:
+
+```json
+{
+    "spawns": [
+        {
+            "item_id": 1, 
+            "location": {
+                "latitude": 50.12345678, 
+                "longitude": -2.61234567
+            }  
+        },
+        {
+            "item_id": 2, 
+            "location": {
+                "latitude": 50.87654321, 
+                "longitude": -2.67654321
+            }  
+        }
+    ]
+}
+```
+
+**Response**: <br>
+Code 200:
+```json
+{}
+```
+Code 400:
+```json
+{
+    "error":"Invalid spawn list"
+}
+```
+or
+```json
+{
+    "error":"Empty spawn list"
+}
+```
+or
+```json
+{
+    "error":"Invalid item ID in list"
+}
+```
+or
+```json
+{
+    "error":"Could not convert latitude to float"
+}
+```
+or
+```json
+{
+    "error":"Could not convert longitude to float"
+}
+```
+or
+```json
+{
+    "error":"Invalid latitude, must be between -90 and 90"
+}
+```
+or
+```json
+{
+    "error":"Invalid longitude, must be between -180 and 180"
+}
+```
+Code 401:
+```json
+{
+    "error":"The access token provided does not match any user"
+}
+```
+or
+```json
+{
+    "error":"User must be a developer"
 }
 ```

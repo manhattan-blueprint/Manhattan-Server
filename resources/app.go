@@ -301,7 +301,7 @@ func (a *App) addResources(w http.ResponseWriter, r *http.Request) {
 	var resReq ResourcesResReq
 	err = decoder.Decode(&resReq)
 	if err != nil {
-		respondWithError(w, http.StatusBadRequest, "Invalid resources list")
+		respondWithError(w, http.StatusBadRequest, "Invalid spawn list")
 		return
 	}
 
@@ -362,7 +362,7 @@ func (a *App) removeResources(w http.ResponseWriter, r *http.Request) {
 	var resReq ResourcesResReq
 	err = decoder.Decode(&resReq)
 	if err != nil {
-		respondWithError(w, http.StatusBadRequest, "Invalid resources list")
+		respondWithError(w, http.StatusBadRequest, "Invalid spawn list")
 		return
 	}
 
