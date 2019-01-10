@@ -8,17 +8,17 @@ The server for the game Blueprint by Manhattan, using Go, Docker and MySQL.
 
 With a local MySQL server running, from the root directory execute the database creation script:
 
-`> mysql -u DATABASE_USERNAME -p < /database/create.sql`
+`> mysql -u DATABASE_USERNAME -p < database/create.sql`
 
-Where `DATABASE_USERNAME` will depend on your local MySQL server credentials.
+Where `DATABASE_USERNAME` will depend on your local MySQL server credentials, by default it will be `root`.
 
 Additionally, to preload the database with developer accounts for adding and removing resources, a second script will need to be run. Contact myself, @smithwjv, for the `dev.sql` script, and place it in the database directory, running it as before:
 
-`> mysql -u DATABASE_USERNAME -p < /database/dev.sql`
+`> mysql -u DATABASE_USERNAME -p < database/dev.sql`
 
 ### Configuration files
 
-If necessary, edit the configuration file in the `authenticate`, `inventory` and `resource` directories. The default values are:
+If necessary, edit the configuration file, `conf.json`, in the `authenticate`, `inventory` and `resource` directories. The default values are:
 
 * `"port": 8000`
 * `"dbUsername": "root"`
