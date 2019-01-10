@@ -1,6 +1,6 @@
 # Manhattan Server
 
-The server for the game Blueprint by Manhattan, using Docker and MySQL.
+The server for the game Blueprint by Manhattan, using Go, Docker and MySQL.
 
 ## Local Deployment Instructions
 
@@ -11,6 +11,10 @@ With a local MySQL server running, from the root directory execute the database 
 `> mysql -u DATABASE_USERNAME -p < /database/create.sql`
 
 Where `DATABASE_USERNAME` will depend on your local MySQL server credentials.
+
+Additionally, to preload the database with developer accounts for adding and removing resources, a second script will need to be run. Contact myself, @smithwjv, for the `dev.sql` script, and place it in the database directory, running it as before:
+
+`> mysql -u DATABASE_USERNAME -p < /database/dev.sql`
 
 ### Configuration files
 
@@ -28,7 +32,17 @@ This configuration:
 * Assumes a MySQL server is hosted locally **not** within a Docker container
 * The database name is set to "blueprint"
 
-Note, the configuration file in the `resource` directory currently only specifies the port to open. This will be updated to match the configuration above when the respective API calls are implemented.
+The configuration file in the `resources` directory has an additional field for specifying developer account usernames, since only developer accounts can add or remove resources. The default values are:
+
+* `"developers": [`<br>
+    `{"username": "Will"},`<br>
+    `{"username": "Jay"},`<br>
+    `{"username": "Adam"},`<br>
+    `{"username": "Andrei"},`<br>
+    `{"username": "Ben"},`<br>
+    `{"username": "Eli"}]`<br>
+
+Though note developer account authentication will only work if accounts with these usernames exist in the database, see [Database Setup](#database-setup).
 
 ### Deployment
 
