@@ -1,5 +1,6 @@
 USE blueprint_test;
 
+/* Insert account for header token authorization */
 INSERT INTO account VALUES (3149194563, 'will', 
     '$2a$10$.Fbb/5zcg.Lclns7e9RyIetChJqw5W1AOgbDu/.GL747/98pK4Xr.');
 
