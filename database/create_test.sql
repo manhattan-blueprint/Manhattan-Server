@@ -31,8 +31,8 @@ CREATE TABLE inventory (
 CREATE TABLE resources (
     spawn_id INT UNSIGNED,
     item_id  INT UNSIGNED NOT NULL,
-    gcs_lat  DECIMAL NOT NULL,
-    gcs_long DECIMAL NOT NULL,
+    gcs_lat  DECIMAL(10,8) NOT NULL,
+    gcs_long DECIMAL(11,8) NOT NULL,
     resource_expire BIGINT NOT NULL,
     PRIMARY KEY (spawn_id)
 );

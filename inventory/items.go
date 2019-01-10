@@ -20,7 +20,7 @@ type Item struct {
 ** quantity is added to the existing entry, otherwise a new entry is added
  */
 func (inv *Inventory) AddInventory(db *sql.DB) error {
-	stmt := "INSERT INTO inventory (user_id, item_id, quantity) VALUES"
+	stmt := "INSERT INTO inventory VALUES"
 	values := []interface{}{}
 	for i := 0; i < len(inv.Items); i++ {
 		stmt += " (?, ?, ?),"

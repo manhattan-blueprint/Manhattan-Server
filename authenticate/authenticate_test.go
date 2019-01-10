@@ -101,8 +101,8 @@ func TestRegisterInvalidJSON(t *testing.T) {
 
 	payload := []byte(`{"will":"smith"}`)
 
-	req, err := http.NewRequest("POST", "/api/v1/authenticate/register",
-		bytes.NewBuffer(payload))
+	req, err := http.NewRequest(http.MethodPost,
+		"/api/v1/authenticate/register", bytes.NewBuffer(payload))
 	if err != nil {
 		t.Errorf("Failed to create request")
 	}
@@ -118,8 +118,8 @@ func TestRegisterBlankJSON(t *testing.T) {
 
 	payload := []byte(`{"username":"","password":""}`)
 
-	req, err := http.NewRequest("POST", "/api/v1/authenticate/register",
-		bytes.NewBuffer(payload))
+	req, err := http.NewRequest(http.MethodPost,
+		"/api/v1/authenticate/register", bytes.NewBuffer(payload))
 	if err != nil {
 		t.Errorf("Failed to create request")
 	}
@@ -136,8 +136,8 @@ func TestRegisterUser(t *testing.T) {
 
 	payload := []byte(`{"username":"will","password":"smith"}`)
 
-	req, err := http.NewRequest("POST", "/api/v1/authenticate/register",
-		bytes.NewBuffer(payload))
+	req, err := http.NewRequest(http.MethodPost,
+		"/api/v1/authenticate/register", bytes.NewBuffer(payload))
 	if err != nil {
 		t.Errorf("Failed to create request")
 	}
@@ -165,8 +165,8 @@ func TestRegisterExistingUsername(t *testing.T) {
 
 	payload := []byte(`{"username":"will","password":"smith"}`)
 
-	req, err := http.NewRequest("POST", "/api/v1/authenticate/register",
-		bytes.NewBuffer(payload))
+	req, err := http.NewRequest(http.MethodPost,
+		"/api/v1/authenticate/register", bytes.NewBuffer(payload))
 	if err != nil {
 		t.Errorf("Failed to create request")
 	}
@@ -174,7 +174,7 @@ func TestRegisterExistingUsername(t *testing.T) {
 	res := executeRequest(req)
 	checkResponseCode(t, http.StatusOK, res.Code)
 
-	req, err = http.NewRequest("POST", "/api/v1/authenticate/register",
+	req, err = http.NewRequest(http.MethodPost, "/api/v1/authenticate/register",
 		bytes.NewBuffer(payload))
 	if err != nil {
 		t.Errorf("Failed to create request")
@@ -191,8 +191,8 @@ func TestLoginInvalidJSON(t *testing.T) {
 	// First register a user
 	payload := []byte(`{"username":"will","password":"smith"}`)
 
-	req, err := http.NewRequest("POST", "/api/v1/authenticate/register",
-		bytes.NewBuffer(payload))
+	req, err := http.NewRequest(http.MethodPost,
+		"/api/v1/authenticate/register", bytes.NewBuffer(payload))
 	if err != nil {
 		t.Errorf("Failed to create request")
 	}
@@ -202,7 +202,7 @@ func TestLoginInvalidJSON(t *testing.T) {
 
 	// Login with invalid JSON
 	payload = []byte(`{"will":"smith"}`)
-	req, err = http.NewRequest("POST", "/api/v1/authenticate",
+	req, err = http.NewRequest(http.MethodPost, "/api/v1/authenticate",
 		bytes.NewBuffer(payload))
 	if err != nil {
 		t.Errorf("Failed to create request")
@@ -221,8 +221,8 @@ func TestLoginUser(t *testing.T) {
 	// First register a user
 	payload := []byte(`{"username":"will","password":"smith"}`)
 
-	req, err := http.NewRequest("POST", "/api/v1/authenticate/register",
-		bytes.NewBuffer(payload))
+	req, err := http.NewRequest(http.MethodPost,
+		"/api/v1/authenticate/register", bytes.NewBuffer(payload))
 	if err != nil {
 		t.Errorf("Failed to create request")
 	}
@@ -233,7 +233,7 @@ func TestLoginUser(t *testing.T) {
 	// Login with correct credentials
 	payload = []byte(`{"username":"will","password":"smith"}`)
 
-	req, err = http.NewRequest("POST", "/api/v1/authenticate",
+	req, err = http.NewRequest(http.MethodPost, "/api/v1/authenticate",
 		bytes.NewBuffer(payload))
 	if err != nil {
 		t.Errorf("Failed to create request")
@@ -264,8 +264,8 @@ func TestLoginIncorrectPassword(t *testing.T) {
 	// First register a user
 	payload := []byte(`{"username":"will","password":"smith"}`)
 
-	req, err := http.NewRequest("POST", "/api/v1/authenticate/register",
-		bytes.NewBuffer(payload))
+	req, err := http.NewRequest(http.MethodPost,
+		"/api/v1/authenticate/register", bytes.NewBuffer(payload))
 	if err != nil {
 		t.Errorf("Failed to create request")
 	}
@@ -276,7 +276,7 @@ func TestLoginIncorrectPassword(t *testing.T) {
 	// Login with incorrect password
 	payload = []byte(`{"username":"will","password":"stretch"}`)
 
-	req, err = http.NewRequest("POST", "/api/v1/authenticate",
+	req, err = http.NewRequest(http.MethodPost, "/api/v1/authenticate",
 		bytes.NewBuffer(payload))
 	if err != nil {
 		t.Errorf("Failed to create request")
@@ -295,8 +295,8 @@ func TestLoginIncorrectUsername(t *testing.T) {
 	// First register a user
 	payload := []byte(`{"username":"will","password":"smith"}`)
 
-	req, err := http.NewRequest("POST", "/api/v1/authenticate/register",
-		bytes.NewBuffer(payload))
+	req, err := http.NewRequest(http.MethodPost,
+		"/api/v1/authenticate/register", bytes.NewBuffer(payload))
 	if err != nil {
 		t.Errorf("Failed to create request")
 	}
@@ -307,7 +307,7 @@ func TestLoginIncorrectUsername(t *testing.T) {
 	// Login with incorrect username but existing password
 	payload = []byte(`{"username":"stretch","password":"smith"}`)
 
-	req, err = http.NewRequest("POST", "/api/v1/authenticate",
+	req, err = http.NewRequest(http.MethodPost, "/api/v1/authenticate",
 		bytes.NewBuffer(payload))
 	if err != nil {
 		t.Errorf("Failed to create request")
@@ -324,7 +324,7 @@ func TestRefreshInvalidJSON(t *testing.T) {
 
 	payload := []byte(`{"will":"smith"}`)
 
-	req, err := http.NewRequest("POST", "/api/v1/authenticate/refresh",
+	req, err := http.NewRequest(http.MethodPost, "/api/v1/authenticate/refresh",
 		bytes.NewBuffer(payload))
 	if err != nil {
 		t.Errorf("Failed to create request")
@@ -341,7 +341,7 @@ func TestRefreshBlankToken(t *testing.T) {
 
 	payload := []byte(`{"refresh":""}`)
 
-	req, err := http.NewRequest("POST", "/api/v1/authenticate/refresh",
+	req, err := http.NewRequest(http.MethodPost, "/api/v1/authenticate/refresh",
 		bytes.NewBuffer(payload))
 	if err != nil {
 		t.Errorf("Failed to create request")
@@ -359,7 +359,7 @@ func TestRefreshIncorrectTokenLength(t *testing.T) {
 	// Token with 63 characters
 	payload := []byte(`{"refresh":"abcdefghijklmnopqrstuvwxyz1234567890abcdefghijklmnopqrstuvwxyz1"}`)
 
-	req, err := http.NewRequest("POST", "/api/v1/authenticate/refresh",
+	req, err := http.NewRequest(http.MethodPost, "/api/v1/authenticate/refresh",
 		bytes.NewBuffer(payload))
 	if err != nil {
 		t.Errorf("Failed to create request")
@@ -371,7 +371,7 @@ func TestRefreshIncorrectTokenLength(t *testing.T) {
 	// Token with 65 characters
 	payload = []byte(`{"refresh":"abcdefghijklmnopqrstuvwxyz1234567890abcdefghijklmnopqrstuvwxyz123"}`)
 
-	req, err = http.NewRequest("POST", "/api/v1/authenticate/refresh",
+	req, err = http.NewRequest(http.MethodPost, "/api/v1/authenticate/refresh",
 		bytes.NewBuffer(payload))
 	if err != nil {
 		t.Errorf("Failed to create request")
@@ -390,8 +390,8 @@ func TestRefreshToken(t *testing.T) {
 	// First register a user
 	payload := []byte(`{"username":"will","password":"smith"}`)
 
-	req, err := http.NewRequest("POST", "/api/v1/authenticate/register",
-		bytes.NewBuffer(payload))
+	req, err := http.NewRequest(http.MethodPost,
+		"/api/v1/authenticate/register", bytes.NewBuffer(payload))
 	if err != nil {
 		t.Errorf("Failed to create request")
 	}
@@ -405,7 +405,7 @@ func TestRefreshToken(t *testing.T) {
 
 	// Refresh with correct token
 	payload = []byte(fmt.Sprintf("{\"refresh\":\"%s\"}", tok.Refresh))
-	req, err = http.NewRequest("POST", "/api/v1/authenticate/refresh",
+	req, err = http.NewRequest(http.MethodPost, "/api/v1/authenticate/refresh",
 		bytes.NewBuffer(payload))
 	if err != nil {
 		t.Errorf("Failed to create request")
@@ -435,8 +435,8 @@ func TestRefreshIncorrectToken(t *testing.T) {
 	// First register a user
 	payload := []byte(`{"username":"will","password":"smith"}`)
 
-	req, err := http.NewRequest("POST", "/api/v1/authenticate/register",
-		bytes.NewBuffer(payload))
+	req, err := http.NewRequest(http.MethodPost,
+		"/api/v1/authenticate/register", bytes.NewBuffer(payload))
 	if err != nil {
 		t.Errorf("Failed to create request")
 	}
@@ -458,7 +458,7 @@ func TestRefreshIncorrectToken(t *testing.T) {
 	}
 
 	payload = []byte(fmt.Sprintf("{\"refresh\":\"%s\"}", incorrectTok))
-	req, err = http.NewRequest("POST", "/api/v1/authenticate/refresh",
+	req, err = http.NewRequest(http.MethodPost, "/api/v1/authenticate/refresh",
 		bytes.NewBuffer(payload))
 	if err != nil {
 		t.Errorf("Failed to create request")
@@ -476,8 +476,8 @@ func TestRefreshRemoveToken(t *testing.T) {
 	// First register a user
 	payload := []byte(`{"username":"will","password":"smith"}`)
 
-	req, err := http.NewRequest("POST", "/api/v1/authenticate/register",
-		bytes.NewBuffer(payload))
+	req, err := http.NewRequest(http.MethodPost,
+		"/api/v1/authenticate/register", bytes.NewBuffer(payload))
 	if err != nil {
 		t.Errorf("Failed to create request")
 	}
@@ -491,7 +491,7 @@ func TestRefreshRemoveToken(t *testing.T) {
 
 	// Refresh with correct token
 	payload = []byte(fmt.Sprintf("{\"refresh\":\"%s\"}", tok.Refresh))
-	req, err = http.NewRequest("POST", "/api/v1/authenticate/refresh",
+	req, err = http.NewRequest(http.MethodPost, "/api/v1/authenticate/refresh",
 		bytes.NewBuffer(payload))
 	if err != nil {
 		t.Errorf("Failed to create request")
@@ -501,7 +501,7 @@ func TestRefreshRemoveToken(t *testing.T) {
 	checkResponseCode(t, http.StatusOK, res.Code)
 
 	// Reuse the previous token
-	req, err = http.NewRequest("POST", "/api/v1/authenticate/refresh",
+	req, err = http.NewRequest(http.MethodPost, "/api/v1/authenticate/refresh",
 		bytes.NewBuffer(payload))
 	if err != nil {
 		t.Errorf("Failed to create request")

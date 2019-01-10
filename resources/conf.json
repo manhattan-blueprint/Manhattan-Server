@@ -1,3 +1,15 @@
 {
-    "port": 8000
+    "port": 8000,
+    "dbUsername": "root",
+    "dbPassword": "",
+    "dbHost": "host.docker.internal",
+    "dbName": "blueprint",
+    "developers": [
+        {"username": "Will"},
+        {"username": "Jay"},
+        {"username": "Adam"},
+        {"username": "Andrei"},
+        {"username": "Ben"},
+        {"username": "Eli"}
+    ]
 }
