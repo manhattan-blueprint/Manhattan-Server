@@ -66,7 +66,7 @@ With the database and configuration files setup and Docker installed, to build t
 
 ## Item Schema
 
-The item schema JSON can be visualised as an item tree:
+The item schema JSON, found in `authenticate/serve/`, can be visualised as an item tree:
 
 ![Item tree image has not loaded.](schemas/images/item_tree.jpg "Item tree")
 

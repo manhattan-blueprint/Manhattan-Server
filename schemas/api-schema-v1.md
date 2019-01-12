@@ -7,8 +7,30 @@
   * 8002 for resources
 * All endpoints must start with `/api/v1`
 * No POST or URL parameters can be blank
-* All requests, aside from Authentication, must contain the access token as a header
+* All requests, aside from Authentication and item schema, must contain the access token as a header
 `Authorization: Bearer <token>`, where each token is a 64 character string
+
+# Item Schema
+
+`/item-schema` (GET) <br>
+**Description**: Get the item schema JSON
+
+**Response**: <br>
+Code 200:
+```json
+{
+    "items":[
+        {
+            "item_id":1,
+            "name":"wood",
+            "type":1,
+            "blueprint":[],
+            "machine_id":null,
+            "recipe":[]
+        },
+        ...
+}
+```
 
 # Authentication
 
