@@ -27,8 +27,8 @@ Code 200:
             "blueprint":[],
             "machine_id":null,
             "recipe":[]
-        },
-        ...
+        }
+    ]
 }
 ```
 
