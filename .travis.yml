@@ -14,9 +14,7 @@ script:
   - if [ "$TRAVIS_PULL_REQUEST" != "false" ]; then 
       echo "Pull request detected - running unit tests" &&
       make test;
-    fi
-
-  - if [ "$TRAVIS_BRANCH" == "develop" ] || [ "$TRAVIS_BRANCH" == "master" ]; then
+    elif [ "$TRAVIS_BRANCH" == "develop" ] || [ "$TRAVIS_BRANCH" == "master" ]; then
       echo "Deploying services to production";
     fi
 
