@@ -8,6 +8,7 @@ services:
 
 before_install:
   - chmod +x deploy.sh
+  - set -o pipefail
 
 after_success:
   ./deploy.sh
