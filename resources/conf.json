@@ -2,7 +2,7 @@
     "port": 8000,
     "dbUsername": "root",
     "dbPassword": "",
-    "dbHost": "127.0.0.1",
+    "dbHost": "172.17.0.1",
     "dbName": "blueprint",
     "developers": [
         {"username": "Will"},
