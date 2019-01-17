@@ -4,6 +4,7 @@ language: go
 
 services:
   - docker
+  - mysql
 
 before_install:
   - chmod +x deploy.sh

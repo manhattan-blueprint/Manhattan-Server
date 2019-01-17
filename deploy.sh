@@ -1,9 +1,8 @@
 #!/bin/bash
 
 if [ "$TRAVIS_PULL_REQUEST" != "false" ]; then
-  # Deploy to a staging environment, or rather, run the unit tests (so we can validate they run on each PR)
   echo "Pull request detected - running unit tests"
-
+  make test
 elif [ "$TRAVIS_BRANCH" == "develop" ] || [ "$TRAVIS_BRANCH" == "master" ]; then
   # This is when a merge happens - ideally we'd split up develop and master but we only have a single production server so no need 
   echo "Deploying services to production"
