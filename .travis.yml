@@ -12,7 +12,7 @@ before_script:
 script:
   
   - if [ "$TRAVIS_PULL_REQUEST" != "false" ]; then 
-      echo "Pull request detected - running unit tests" &&\
+      echo "Pull request detected - running unit tests" &&
       make test;
     fi
 
