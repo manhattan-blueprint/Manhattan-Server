@@ -15,6 +15,7 @@ script:
       echo "Pull request detected - running unit tests" &&
       ip addr show &&
       cat ~travis/.my.cnf &&
+      cat /var/run/mysqld/mysqld.sock &&
       make test;
     elif [ "$TRAVIS_BRANCH" == "develop" ] || [ "$TRAVIS_BRANCH" == "master" ]; then
       echo "Deploying services to production";
