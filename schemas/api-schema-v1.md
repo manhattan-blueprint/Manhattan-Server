@@ -240,14 +240,16 @@ Code 200:
             "location": {
                 "latitude": 50.12345678, 
                 "longitude": -2.61234567
-            }  
+            },
+            "quantity": 3
         },
         {
             "item_id": 2, 
             "location": {
                 "latitude": 50.87654321, 
                 "longitude": -2.67654321
-            }  
+            },
+            "quantity": 5
         }
     ]
 }
@@ -306,6 +308,7 @@ Parameter | Type | Description
 ---|---|---
 item_id  | Int | The item to add (1 - 16 inclusive)
 location | Object | The location of the item to add
+quantity | Int | The quantity to add (1 or greater)
 
 Where the location object has the following contents:
 
@@ -324,14 +327,16 @@ Example:
             "location": {
                 "latitude": 50.12345678, 
                 "longitude": -2.61234567
-            }  
+            },
+            "quantity": 3
         },
         {
             "item_id": 2, 
             "location": {
                 "latitude": 50.87654321, 
                 "longitude": -2.67654321
-            }  
+            },
+            "quantity": 5
         }
     ]
 }
@@ -370,6 +375,12 @@ or
 ```json
 {
     "error":"Could not convert longitude to float"
+}
+```
+or
+```json
+{
+    "error":"Invalid resource quantity in list"
 }
 ```
 or
@@ -405,14 +416,15 @@ or
 
 Parameter | Type | Description
 ---|---|---
-spawns | List | List of item_id, location pairs to add
+spawns | List | List of item_id, location pairs to remove
 
 Where each list element has the following contents:
 
 Parameter | Type | Description
 ---|---|---
-item_id  | Int | The item to add (1 - 16 inclusive)
-location | Object | The location of the item to add
+item_id  | Int | The item to remove (1 - 16 inclusive)
+location | Object | The location of the item to remove
+quantity | Int | The quantity to remove (1 or greater, must match)
 
 Where the location object has the following contents:
 
@@ -431,14 +443,16 @@ Example:
             "location": {
                 "latitude": 50.12345678, 
                 "longitude": -2.61234567
-            }  
+            },
+            "quantity": 3  
         },
         {
             "item_id": 2, 
             "location": {
                 "latitude": 50.87654321, 
                 "longitude": -2.67654321
-            }  
+            },
+            "quantity": 5  
         }
     ]
 }
@@ -477,6 +491,12 @@ or
 ```json
 {
     "error":"Could not convert longitude to float"
+}
+```
+or
+```json
+{
+    "error":"Invalid resource quantity in list"
 }
 ```
 or
