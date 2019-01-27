@@ -125,7 +125,7 @@ func getIDFromToken(db *sql.DB, r *http.Request) (uint32, error) {
 
 	// Get token string
 	tokString := authHeader[len(BEARER_PREFIX):]
-	fmt.Printf("Token: <%s>\n", tokString)
+
 	// Check token and get user_id
 	stmt := "SELECT user_id FROM token WHERE access=?"
 	err := db.QueryRow(stmt, tokString).Scan(&id.Value)
