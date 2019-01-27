@@ -222,7 +222,7 @@ func TestAddGetResourcesWithinRadius(t *testing.T) {
 	clearResourcesTable(t)
 
 	// Add resource
-	payload := []byte(`{"spawns":[{"item_id":5,"location":{"latitude":51.456061,"longitude":-2.603104}}]}`)
+	payload := []byte(`{"spawns":[{"item_id":5,"location":{"latitude":51.456061,"longitude":-2.603104},"quantity":3}]}`)
 
 	req, err := http.NewRequest(http.MethodPost, "/api/v1/resources",
 		bytes.NewBuffer(payload))
@@ -268,6 +268,10 @@ func TestAddGetResourcesWithinRadius(t *testing.T) {
 		t.Errorf("Expected longitude -2.603104. Actual was %11.8f",
 			resources.Spawns[0].Location.Longitude)
 	}
+	if resources.Spawns[0].Quantity != 3 {
+		t.Errorf("Expected quantity of 3. Actual quantity was %d",
+			resources.Spawns[0].Quantity)
+	}
 }
 
 /* Check adding resource and getting resource outside radius of coordinate,
@@ -276,7 +280,7 @@ func TestAddGetResourcesOutsideRadius(t *testing.T) {
 	clearResourcesTable(t)
 
 	// Add resource
-	payload := []byte(`{"spawns":[{"item_id":5,"location":{"latitude":51.456061,"longitude":-2.603104}}]}`)
+	payload := []byte(`{"spawns":[{"item_id":5,"location":{"latitude":51.456061,"longitude":-2.603104},"quantity":3}]}`)
 
 	req, err := http.NewRequest(http.MethodPost, "/api/v1/resources",
 		bytes.NewBuffer(payload))
@@ -316,7 +320,7 @@ func TestAddGetMultipleResources(t *testing.T) {
 	clearResourcesTable(t)
 
 	// Add resource
-	payload := []byte(`{"spawns":[{"item_id":1,"location":{"latitude":51.456061,"longitude":-2.603104}},{"item_id":2,"location":{"latitude":51.454244,"longitude":-2.607209}},{"item_id":3,"location":{"latitude":51.472149,"longitude":-2.625381}},{"item_id":4,"location":{"latitude":51.449645,"longitude":-2.581146}}]}`)
+	payload := []byte(`{"spawns":[{"item_id":1,"location":{"latitude":51.456061,"longitude":-2.603104},"quantity":3},{"item_id":2,"location":{"latitude":51.454244,"longitude":-2.607209},"quantity":4},{"item_id":3,"location":{"latitude":51.472149,"longitude":-2.625381},"quantity":5},{"item_id":4,"location":{"latitude":51.449645,"longitude":-2.581146},"quantity":6}]}`)
 
 	req, err := http.NewRequest(http.MethodPost, "/api/v1/resources",
 		bytes.NewBuffer(payload))
@@ -362,7 +366,7 @@ func TestAddRemoveOnlyDeveloper(t *testing.T) {
 	clearResourcesTable(t)
 
 	// Add resource with a normal account
-	payload := []byte(`{"spawns":[{"item_id":5,"location":{"latitude":51.456061,"longitude":-2.603104}}]}`)
+	payload := []byte(`{"spawns":[{"item_id":5,"location":{"latitude":51.456061,"longitude":-2.603104},"quantity":3}]}`)
 
 	req, err := http.NewRequest(http.MethodPost, "/api/v1/resources",
 		bytes.NewBuffer(payload))
@@ -442,7 +446,7 @@ func TestAddRemoveEmptyResources(t *testing.T) {
 func TestAddRemoveInvalidItemID(t *testing.T) {
 	clearResourcesTable(t)
 
-	payload := []byte(`{"spawns":[{"item_id":17,"location":{"latitude":51.456061,"longitude":-2.603104}}]}`)
+	payload := []byte(`{"spawns":[{"item_id":17,"location":{"latitude":51.456061,"longitude":-2.603104},"quantity":3}]}`)
 
 	// Add
 	req, err := http.NewRequest(http.MethodPost, "/api/v1/resources",
@@ -474,7 +478,7 @@ func TestAddRemoveInvalidLatLong(t *testing.T) {
 	clearResourcesTable(t)
 
 	// Invalid latitude
-	payload := []byte(`{"spawns":[{"item_id":5,"location":{"latitude":151.456061,"longitude":-2.603104}}]}`)
+	payload := []byte(`{"spawns":[{"item_id":5,"location":{"latitude":151.456061,"longitude":-2.603104},"quantity":3}]}`)
 
 	// Add
 	req, err := http.NewRequest(http.MethodPost, "/api/v1/resources",
@@ -524,11 +528,42 @@ func TestAddRemoveInvalidLatLong(t *testing.T) {
 	checkResponseCode(t, http.StatusBadRequest, res.Code)
 }
 
+/* Check spawn lists with invalid quantities are not accepted for
+** adding and removing */
+func TestAddRemoveInvalidQuantity(t *testing.T) {
+	clearResourcesTable(t)
+
+	payload := []byte(`{"spawns":[{"item_id":17,"location":{"latitude":51.456061,"longitude":-2.603104},"quantity":0}]}`)
+
+	// Add
+	req, err := http.NewRequest(http.MethodPost, "/api/v1/resources",
+		bytes.NewBuffer(payload))
+	req.Header.Set("Authorization", DEV_ACCESS_TOKEN)
+	if err != nil {
+		t.Errorf("Failed to create request")
+	}
+
+	res := executeRequest(req)
+	checkResponseCode(t, http.StatusBadRequest, res.Code)
+
+	// Remove
+	req, err = http.NewRequest(http.MethodDelete, "/api/v1/resources",
+		bytes.NewBuffer(payload))
+	req.Header.Set("Authorization", DEV_ACCESS_TOKEN)
+	if err != nil {
+		t.Errorf("Failed to create request")
+	}
+
+	res = executeRequest(req)
+	checkResponseCode(t, http.StatusBadRequest, res.Code)
+
+}
+
 /* Check removing resource removes resource */
 func TestRemoveResource(t *testing.T) {
 	clearResourcesTable(t)
 
-	payload := []byte(`{"spawns":[{"item_id":5,"location":{"latitude":51.456061,"longitude":-2.603104}}]}`)
+	payload := []byte(`{"spawns":[{"item_id":5,"location":{"latitude":51.456061,"longitude":-2.603104},"quantity":3}]}`)
 
 	// Add
 	req, err := http.NewRequest(http.MethodPost, "/api/v1/resources",

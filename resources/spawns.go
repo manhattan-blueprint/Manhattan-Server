@@ -14,6 +14,7 @@ type Spawn struct {
 	ItemID         uint32  `json:"item_id"`
 	GCSLat         float64 `json:"gcs_lat"`
 	GCSLong        float64 `json:"gcs_long"`
+	Quantity       uint32  `json:"quantity"`
 	ResourceExpire int64   `json:"resource_expire"`
 }
 
@@ -22,9 +23,9 @@ func (res *Resources) AddResources(db *sql.DB) error {
 	stmt := "INSERT INTO resources VALUES"
 	values := []interface{}{}
 	for i := 0; i < len(res.Spawns); i++ {
-		stmt += " (?, ?, ?, ?, ?),"
+		stmt += " (?, ?, ?, ?, ?, ?),"
 		values = append(values, res.Spawns[i].SpawnID, res.Spawns[i].ItemID,
-			res.Spawns[i].GCSLat, res.Spawns[i].GCSLong,
+			res.Spawns[i].GCSLat, res.Spawns[i].GCSLong, res.Spawns[i].Quantity,
 			res.Spawns[i].ResourceExpire)
 	}
 	// Remove the trailing comma

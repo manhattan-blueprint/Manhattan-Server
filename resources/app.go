@@ -35,6 +35,7 @@ type ResourcesResReq struct {
 type SpawnResReq struct {
 	ItemID   uint32         `json:"item_id"`
 	Location LocationResReq `json:"location"`
+	Quantity uint32         `json:"quantity"`
 }
 
 type LocationResReq struct {
@@ -174,6 +175,9 @@ func checkValidResources(res ResourcesResReq) error {
 		if err != nil {
 			return err
 		}
+		if res.Spawns[i].Quantity <= 0 {
+			return errors.New("Invalid resource quantity in list")
+		}
 	}
 	return nil
 }
@@ -243,11 +247,8 @@ func (a *App) getResources(w http.ResponseWriter, r *http.Request) {
 
 	/* Get resources within radius, using the Haversine formula, where 6371 is
 	** the radius of Earth in kilometres */
-	stmt := "SELECT item_id, gcs_lat, gcs_long FROM (SELECT item_id, " +
-		"gcs_lat, gcs_long, (6371 * ACOS(COS(RADIANS(?)) " +
-		"* COS(RADIANS(gcs_lat)) * COS(RADIANS(gcs_long) - RADIANS(?)) " +
-		"+ SIN(RADIANS(?)) * SIN(RADIANS(gcs_lat)))) AS distance FROM " +
-		"resources " + fmt.Sprintf("HAVING distance < %d ", RESOURCE_RADIUS) +
+	stmt := "SELECT item_id, gcs_lat, gcs_long, quantity FROM (SELECT item_id, gcs_lat, gcs_long, quantity, (6371 * ACOS(COS(RADIANS(?)) * COS(RADIANS(gcs_lat)) * COS(RADIANS(gcs_long) - RADIANS(?)) + SIN(RADIANS(?)) * SIN(RADIANS(gcs_lat)))) AS distance FROM resources " +
+		fmt.Sprintf("HAVING distance < %d ", RESOURCE_RADIUS) +
 		"ORDER BY distance ASC) AS with_distance"
 
 	rows, err := a.DB.Query(stmt, lat, long, lat)
@@ -264,7 +265,8 @@ func (a *App) getResources(w http.ResponseWriter, r *http.Request) {
 	for rows.Next() {
 		var spawnRes SpawnResReq
 		var locRes LocationResReq
-		err = rows.Scan(&spawnRes.ItemID, &locRes.Latitude, &locRes.Longitude)
+		err = rows.Scan(&spawnRes.ItemID, &locRes.Latitude, &locRes.Longitude,
+			&spawnRes.Quantity)
 		if err != nil {
 			respondWithError(w, http.StatusInternalServerError, err.Error())
 			return
@@ -325,6 +327,7 @@ func (a *App) addResources(w http.ResponseWriter, r *http.Request) {
 		spawn.ItemID = resReq.Spawns[i].ItemID
 		spawn.GCSLat = resReq.Spawns[i].Location.Latitude
 		spawn.GCSLong = resReq.Spawns[i].Location.Longitude
+		spawn.Quantity = resReq.Spawns[i].Quantity
 
 		// Change expiry
 		spawn.ResourceExpire = time.Now().AddDate(resourceExpire[0],
@@ -372,13 +375,13 @@ func (a *App) removeResources(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	stmt := "DELETE FROM resources WHERE (item_id, gcs_lat, gcs_long) IN ("
+	stmt := "DELETE FROM resources WHERE (item_id, gcs_lat, gcs_long, quantity) IN ("
 	values := []interface{}{}
 	for i := 0; i < len(resReq.Spawns); i++ {
-		stmt += "(?, ?, ?), "
+		stmt += "(?, ?, ?, ?), "
 		values = append(values, resReq.Spawns[i].ItemID,
 			resReq.Spawns[i].Location.Latitude,
-			resReq.Spawns[i].Location.Longitude)
+			resReq.Spawns[i].Location.Longitude, resReq.Spawns[i].Quantity)
 	}
 	// Remove the trailing space and comma, and add closing parenthesis
 	stmt = strings.TrimSuffix(stmt, ", ")
