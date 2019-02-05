@@ -1,0 +1,7 @@
+{
+    "port": 8000,
+    "dbUsername": "root",
+    "dbPassword": "",
+    "dbHost": "host.docker.internal",
+    "dbName": "blueprint"
+}
