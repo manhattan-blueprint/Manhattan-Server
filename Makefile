@@ -4,6 +4,7 @@ run:
 	docker build -t authenticate authenticate/
 	docker build -t inventory inventory/
 	docker build -t resources resources/
+	docker build -t progress progress/
 	docker swarm init
 	docker stack deploy -c docker-compose.yml blueprint
 
@@ -15,6 +16,7 @@ build:
 	docker build -t authenticate authenticate/
 	docker build -t inventory inventory/
 	docker build -t resources resources/
+	docker build -t progress progress/
 
 test: test_auth test_inv test_res
 
