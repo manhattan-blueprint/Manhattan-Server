@@ -9,6 +9,7 @@
 * No POST or URL parameters can be blank
 * All requests, aside from Authentication and item schema, must contain the access token as a header
 `Authorization: Bearer <token>`, where each token is a 64 character string
+* All errors will be a JSON the form `"error":"Example error"`
 
 # Item Schema
 
@@ -52,18 +53,6 @@ Code 200:
     "refresh":"ijklmnop"
 }
 ```
-Code 400:
-```json
-{
-    "error":"Invalid username or password"
-}
-```
-or
-```json
-{
-    "error":"Username already exists"
-}
-```
 
 `/authenticate` (POST) <br>
 **Description**: Validate an existing user and get access tokens 
@@ -81,18 +70,6 @@ Code 200:
 {
     "access":"abcdefgh",
     "refresh":"ijklmnop"
-}
-```
-Code 400:
-```json
-{
-    "error":"Invalid username or password"
-}
-```
-Code 401:
-```json
-{
-    "error":"The credentials provided do not match any user"
 }
 ```
 
@@ -114,18 +91,6 @@ Code 200:
     "refresh":"ijklmnop"
 }
 ```
-Code 400:
-```json
-{
-    "error":"Invalid refresh token"
-}
-```
-Code 401:
-```json
-{
-    "error":"The refresh token provided does not match any user"
-}
-```
 
 # Inventory
 `/inventory` (GET) <br>
@@ -140,12 +105,6 @@ Code 200:
         {"item_id": 1, "quantity": 3},
         {"item_id": 2, "quantity": 300},
     ] 
-}
-```
-Code 401:
-```json
-{
-    "error":"The access token provided does not match any user"
 }
 ```
 
@@ -171,36 +130,6 @@ Code 200:
 ```json
 {}
 ```
-Code 400:
-```json
-{
-    "error":"Invalid item list"
-}
-```
-or
-```json
-{
-    "error":"Empty item list"
-}
-```
-or
-```json
-{
-    "error":"Invalid item ID in list"
-}
-```
-or
-```json
-{
-    "error":"Invalid item quantity in list"
-}
-```
-Code 401:
-```json
-{
-    "error":"The access token provided does not match any user"
-}
-```
 
 ---
 `/inventory` (DELETE)<br>
@@ -210,13 +139,6 @@ Code 401:
 Code 200:
 ```json
 {}
-```
-
-Code 401:
-```json
-{
-    "error":"The access token provided does not match any user"
-}
 ```
 
 # Resources
@@ -252,43 +174,6 @@ Code 200:
             "quantity": 5
         }
     ]
-}
-```
-
-Code 400: 
-```json
-{
-    "error":"Latitude and longitude parameters are required"
-}
-```
-or
-```json
-{
-    "error":"Could not convert latitude to float"
-}
-```
-or
-```json
-{
-    "error":"Could not convert longitude to float"
-}
-```
-or
-```json
-{
-    "error":"Invalid latitude, must be between -90 and 90"
-}
-```
-or
-```json
-{
-    "error":"Invalid longitude, must be between -180 and 180"
-}
-```
-Code 401:
-```json
-{
-    "error":"The access token provided does not match any user"
 }
 ```
 
@@ -347,66 +232,6 @@ Code 200:
 ```json
 {}
 ```
-Code 400:
-```json
-{
-    "error":"Invalid spawn list"
-}
-```
-or
-```json
-{
-    "error":"Empty spawn list"
-}
-```
-or
-```json
-{
-    "error":"Invalid item ID in list"
-}
-```
-or
-```json
-{
-    "error":"Could not convert latitude to float"
-}
-```
-or
-```json
-{
-    "error":"Could not convert longitude to float"
-}
-```
-or
-```json
-{
-    "error":"Invalid resource quantity in list"
-}
-```
-or
-```json
-{
-    "error":"Invalid latitude, must be between -90 and 90"
-}
-```
-or
-```json
-{
-    "error":"Invalid longitude, must be between -180 and 180"
-}
-```
-Code 401:
-```json
-{
-    "error":"The access token provided does not match any user"
-}
-```
-or
-```json
-{
-    "error":"User must be a developer"
-}
-```
 
 ---
 `/resources` (DELETE)<br>
@@ -462,64 +287,4 @@ Example:
 Code 200:
 ```json
 {}
-```
-Code 400:
-```json
-{
-    "error":"Invalid spawn list"
-}
-```
-or
-```json
-{
-    "error":"Empty spawn list"
-}
-```
-or
-```json
-{
-    "error":"Invalid item ID in list"
-}
-```
-or
-```json
-{
-    "error":"Could not convert latitude to float"
-}
-```
-or
-```json
-{
-    "error":"Could not convert longitude to float"
-}
-```
-or
-```json
-{
-    "error":"Invalid resource quantity in list"
-}
-```
-or
-```json
-{
-    "error":"Invalid latitude, must be between -90 and 90"
-}
-```
-or
-```json
-{
-    "error":"Invalid longitude, must be between -180 and 180"
-}
-```
-Code 401:
-```json
-{
-    "error":"The access token provided does not match any user"
-}
-```
-or
-```json
-{
-    "error":"User must be a developer"
-}
 ```
