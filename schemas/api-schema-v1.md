@@ -306,3 +306,41 @@ Code 200:
 ```json
 {}
 ```
+
+# Progress
+`/progress` (GET) <br>
+**Description**: Fetch progress for given user associated with access token. Only returns blueprints that they have completed, not all possible.
+
+**Response**: <br>
+Code 200:
+```json
+{
+    "blueprints": [
+        {"item_id": 0},
+        {"item_id": 1},
+        {"item_id": 2},
+    ]
+}
+```
+
+---
+`/progress` (POST) <br>
+**Description**: Add blueprint(s) to progress
+
+**Request Contents**:
+
+Parameter | Type | Description
+---|---|---
+blueprints | List | List of completed blueprints
+
+Where each list element has the following contents:
+
+Parameter | Type | Description
+---|---|---
+item_id  | Int | The blueprint item_id to add (1 - 16 inclusive)
+
+**Response**: <br>
+Code 200:
+```json
+{}
+```
