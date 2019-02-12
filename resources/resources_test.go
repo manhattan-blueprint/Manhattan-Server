@@ -409,7 +409,6 @@ func TestGetDeveloperStatus(t *testing.T) {
 		t.Errorf("Expected developer status to be true. Actual was %t",
 			devRes.Developer)
 	}
-
 }
 
 /* Check only developer accounts can add and remove resources */
