@@ -43,6 +43,10 @@ type LocationResReq struct {
 	Longitude float64 `json:"longitude"`
 }
 
+type DeveloperResponse struct {
+	Developer bool `json:"developer"`
+}
+
 const BEARER_PREFIX string = "Bearer "
 const MAX_ITEM_ID uint32 = 16
 
@@ -81,6 +85,8 @@ func (a *App) initialiseRoutes() {
 	prefix := "/api/v1"
 	a.Router.HandleFunc(fmt.Sprintf("%s/resources", prefix),
 		a.getResources).Methods(http.MethodGet)
+	a.Router.HandleFunc(fmt.Sprintf("%s/resources/dev", prefix),
+		a.getDeveloperStatus).Methods(http.MethodGet)
 	a.Router.HandleFunc(fmt.Sprintf("%s/resources", prefix),
 		a.addResources).Methods(http.MethodPost)
 	a.Router.HandleFunc(fmt.Sprintf("%s/resources", prefix),
@@ -282,6 +288,25 @@ func (a *App) getResources(w http.ResponseWriter, r *http.Request) {
 	}
 
 	respondWithJSON(w, http.StatusOK, resRes)
+}
+
+/* Validate auth token, check user is developer and return result */
+func (a *App) getDeveloperStatus(w http.ResponseWriter, r *http.Request) {
+	id, err := getIDFromToken(a.DB, r)
+	if err != nil {
+		respondWithError(w, http.StatusUnauthorized, err.Error())
+		return
+	}
+
+	var devRes DeveloperResponse
+	err = checkDeveloper(a.DB, id)
+	if err != nil {
+		devRes.Developer = false
+		respondWithJSON(w, http.StatusOK, devRes)
+		return
+	}
+	devRes.Developer = true
+	respondWithJSON(w, http.StatusOK, devRes)
 }
 
 /* Validate auth token, check user is developer and add resource(s) */
