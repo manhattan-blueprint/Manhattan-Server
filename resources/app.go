@@ -298,14 +298,11 @@ func (a *App) getDeveloperStatus(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	var devRes DeveloperResponse
+	devRes := DeveloperResponse{Developer: true}
 	err = checkDeveloper(a.DB, id)
 	if err != nil {
 		devRes.Developer = false
-		respondWithJSON(w, http.StatusOK, devRes)
-		return
 	}
-	devRes.Developer = true
 	respondWithJSON(w, http.StatusOK, devRes)
 }
 
