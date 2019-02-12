@@ -22,7 +22,16 @@ type ID struct {
 	Value uint32
 }
 
+type ProgressResponse struct {
+	Blueprints []BlueprintResponse `json:"blueprints"`
+}
+
+type BlueprintResponse struct {
+	ItemID uint32 `json:"item_id"`
+}
+
 const BEARER_PREFIX string = "Bearer "
+const MAX_ITEM_ID uint32 = 16
 
 /* Initialise database connection, mux router and routes */
 func (a *App) Initialise(dbUser, dbPassword, dbHost, dbName string) error {
@@ -109,24 +118,95 @@ func getIDFromToken(db *sql.DB, r *http.Request) (uint32, error) {
 	return id.Value, nil
 }
 
+/* Check sent blueprint list is valid */
+func checkValidProgress(pro Progress) error {
+	if len(pro.Blueprints) <= 0 {
+		return errors.New("Empty blueprint list")
+	}
+	for i := 0; i < len(pro.Blueprints); i++ {
+		/* Does not check if item ID is actually a blueprint, only if valid item ID.
+		** Ideally this would check against the item schema, to see if the item
+		** ID(s) sent have the correct type
+		 */
+		if pro.Blueprints[i].ItemID <= 0 || pro.Blueprints[i].ItemID > MAX_ITEM_ID {
+			return errors.New("Invalid item ID in list")
+		}
+	}
+	return nil
+}
+
 /* Return user progress */
 func (a *App) getProgress(w http.ResponseWriter, r *http.Request) {
-	_, err := getIDFromToken(a.DB, r)
+	id, err := getIDFromToken(a.DB, r)
 	if err != nil {
 		respondWithError(w, http.StatusUnauthorized, err.Error())
 		return
 	}
 
-	respondWithError(w, http.StatusNotImplemented, "Not yet implemented")
+	stmt := "SELECT item_id FROM progress WHERE user_id=?"
+	rows, err := a.DB.Query(stmt, id)
+	if err != nil {
+		respondWithError(w, http.StatusInternalServerError, err.Error())
+	}
+	defer rows.Close()
+
+	// Convert results rows into progress response structure
+	var proRes ProgressResponse
+	// Handle empty progress case
+	proRes.Blueprints = make([]BlueprintResponse, 0)
+	for rows.Next() {
+		var bluRes BlueprintResponse
+		err = rows.Scan(&bluRes.ItemID)
+		if err != nil {
+			respondWithError(w, http.StatusInternalServerError, err.Error())
+			return
+		}
+		proRes.Blueprints = append(proRes.Blueprints, bluRes)
+	}
+	// Handle any errors encountered during iteration
+	err = rows.Err()
+	if err != nil {
+		respondWithError(w, http.StatusInternalServerError, err.Error())
+		return
+	}
+
+	respondWithJSON(w, http.StatusOK, proRes)
 }
 
 /* Add user progress */
 func (a *App) addProgress(w http.ResponseWriter, r *http.Request) {
-	_, err := getIDFromToken(a.DB, r)
+	id, err := getIDFromToken(a.DB, r)
 	if err != nil {
 		respondWithError(w, http.StatusUnauthorized, err.Error())
 		return
 	}
 
-	respondWithError(w, http.StatusNotImplemented, "Not yet implemented")
+	// Decode json body into progress struct
+	decoder := json.NewDecoder(r.Body)
+	var pro Progress
+	err = decoder.Decode(&pro)
+	if err != nil {
+		respondWithError(w, http.StatusBadRequest, "Invalid blueprint list")
+		return
+	}
+
+	err = checkValidProgress(pro)
+	if err != nil {
+		respondWithError(w, http.StatusBadRequest, err.Error())
+		return
+	}
+
+	// Add user ID to blueprint(s)
+	for i := 0; i < len(pro.Blueprints); i++ {
+		pro.Blueprints[i].UserID = id
+	}
+
+	// Query database
+	err = pro.AddProgress(a.DB)
+	if err != nil {
+		respondWithError(w, http.StatusInternalServerError, err.Error())
+		return
+	}
+
+	respondWithEmptyJSON(w, http.StatusOK)
 }
