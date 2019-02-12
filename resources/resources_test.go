@@ -361,6 +361,57 @@ func TestAddGetMultipleResources(t *testing.T) {
 	}
 }
 
+/* Check developer status is correctly returned */
+func TestGetDeveloperStatus(t *testing.T) {
+	clearResourcesTable(t)
+
+	// Check developer status of normal account
+	req, err := http.NewRequest(http.MethodGet, "/api/v1/resources/dev",
+		nil)
+	req.Header.Set("Authorization", NORMAL_ACCESS_TOKEN)
+	if err != nil {
+		t.Errorf("Failed to create request")
+	}
+
+	res := executeRequest(req)
+	checkResponseCode(t, http.StatusOK, res.Code)
+
+	// Check returned developer status is false
+	decoder := json.NewDecoder(res.Body)
+	var devRes DeveloperResponse
+	err = decoder.Decode(&devRes)
+	if err != nil {
+		t.Errorf("Failed to decode developer response")
+	}
+	if devRes.Developer != false {
+		t.Errorf("Expected developer status to be false. Actual was %t",
+			devRes.Developer)
+	}
+
+	// Check developer status of developer account
+	req, err = http.NewRequest(http.MethodGet, "/api/v1/resources/dev",
+		nil)
+	req.Header.Set("Authorization", DEV_ACCESS_TOKEN)
+	if err != nil {
+		t.Errorf("Failed to create request")
+	}
+
+	res = executeRequest(req)
+	checkResponseCode(t, http.StatusOK, res.Code)
+
+	// Check returned developer status is true
+	decoder = json.NewDecoder(res.Body)
+	err = decoder.Decode(&devRes)
+	if err != nil {
+		t.Errorf("Failed to decode developer response")
+	}
+	if devRes.Developer != true {
+		t.Errorf("Expected developer status to be true. Actual was %t",
+			devRes.Developer)
+	}
+
+}
+
 /* Check only developer accounts can add and remove resources */
 func TestAddRemoveOnlyDeveloper(t *testing.T) {
 	clearResourcesTable(t)
