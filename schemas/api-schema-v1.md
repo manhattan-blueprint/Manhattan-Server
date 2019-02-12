@@ -132,7 +132,7 @@ Code 200:
 ```
 
 ---
-`/inventory` (DELETE)<br>
+`/inventory` (DELETE) <br>
 **Description**: Delete all inventory items for user
 
 **Response**: <br>
@@ -174,6 +174,24 @@ Code 200:
             "quantity": 5
         }
     ]
+}
+```
+
+---
+`/resources/dev` (GET) <br>
+**Description**: Check developer status for given user associated with access token.
+
+**Response**: <br>
+Cose 200:
+```json
+{
+    "developer":true
+}
+```
+or
+```json
+{
+    "developer":false
 }
 ```
 
@@ -234,7 +252,7 @@ Code 200:
 ```
 
 ---
-`/resources` (DELETE)<br>
+`/resources` (DELETE) <br>
 **Description**: Remove resource(s), from a developer account
 
 **Request Contents**:
