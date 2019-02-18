@@ -15,7 +15,7 @@ type Blueprint struct {
 }
 
 func (pro *Progress) AddProgress(db *sql.DB) error {
-	stmt := "INSERT INTO progress VALUES"
+	stmt := "INSERT IGNORE INTO progress VALUES"
 	values := []interface{}{}
 	for i := 0; i < len(pro.Blueprints); i++ {
 		stmt += " (?, ?),"
