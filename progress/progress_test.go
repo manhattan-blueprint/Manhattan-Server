@@ -4,6 +4,8 @@ import (
 	"errors"
 	"fmt"
 	"log"
+	"net/http"
+	"net/http/httptest"
 	"os"
 	"testing"
 )
@@ -58,4 +60,23 @@ func checkProgressTableExistsEmpty() error {
 		return errors.New("Progress table is not empty")
 	}
 	return nil
+}
+
+func clearProgressTable(t *testing.T) {
+	_, err := testA.DB.Exec("DELETE FROM progress")
+	if err != nil {
+		t.Errorf("Failed to clear progress table")
+	}
+}
+
+func executeRequest(req *http.Request) *httptest.ResponseRecorder {
+	rec := httptest.NewRecorder()
+	testA.Router.ServeHTTP(rec, req)
+	return rec
+}
+
+func checkResponseCode(t *testing.T, expected, actual int) {
+	if expected != actual {
+		t.Errorf("Expected response code: %d. Actual: %d\n", expected, actual)
+	}
 }
