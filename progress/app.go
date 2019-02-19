@@ -147,6 +147,7 @@ func (a *App) getProgress(w http.ResponseWriter, r *http.Request) {
 	rows, err := a.DB.Query(stmt, id)
 	if err != nil {
 		respondWithError(w, http.StatusInternalServerError, err.Error())
+		return
 	}
 	defer rows.Close()
 
