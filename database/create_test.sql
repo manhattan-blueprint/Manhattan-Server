@@ -37,3 +37,10 @@ CREATE TABLE resources (
     resource_expire BIGINT NOT NULL,
     PRIMARY KEY (spawn_id)
 );
+
+CREATE TABLE progress (
+    user_id INT UNSIGNED,
+    item_id INT UNSIGNED,
+    FOREIGN KEY (user_id) REFERENCES account(user_id),
+    PRIMARY KEY (user_id, item_id)
+);
