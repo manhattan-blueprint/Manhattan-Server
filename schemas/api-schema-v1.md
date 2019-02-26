@@ -5,6 +5,7 @@
   * 8000 for authenticate
   * 8001 for inventory
   * 8002 for resources
+  * 8003 for progress
 * All endpoints must start with `/api/v1`
 * No POST or URL parameters can be blank
 * All requests, aside from Authentication and item schema, must contain the access token as a header
@@ -36,7 +37,7 @@ Code 200:
 # Authentication
 
 `/authenticate/register` (POST) <br>
-**Description**: Create a new user and get auth tokens
+**Description**: Create a new user and get auth tokens and account type
 
 **Request Contents**:
 
@@ -50,12 +51,13 @@ Code 200:
 ```json
 {
     "access":"abcdefgh",
-    "refresh":"ijklmnop"
+    "refresh":"ijklmnop",
+    "type":"player"
 }
 ```
 
 `/authenticate` (POST) <br>
-**Description**: Validate an existing user and get access tokens 
+**Description**: Validate an existing user and get access tokens and account type
 
 **Request Contents**:
 
@@ -69,7 +71,8 @@ Code 200:
 ```json
 {
     "access":"abcdefgh",
-    "refresh":"ijklmnop"
+    "refresh":"ijklmnop",
+    "type":"player"
 }
 ```
 
@@ -88,7 +91,8 @@ Code 200:
 ```json
 {
     "access":"abcdefgh",
-    "refresh":"ijklmnop"
+    "refresh":"ijklmnop",
+    "type":"player"
 }
 ```
 
