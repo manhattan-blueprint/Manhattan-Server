@@ -2,9 +2,9 @@ USE blueprint_test;
 
 /* Insert a developer account and a normal account */
 INSERT INTO account VALUES (3149194563, 'Will', 
-    '$2a$10$.Fbb/5zcg.Lclns7e9RyIetChJqw5W1AOgbDu/.GL747/98pK4Xr.'), 
+    '$2a$10$.Fbb/5zcg.Lclns7e9RyIetChJqw5W1AOgbDu/.GL747/98pK4Xr.', 'developer'), 
     (2121631167, 'John', 
-    '$2a$10$zwoA3n.Hyi6O/737YyPWdOr2De9GFIUesnPPWDroGg4L95dg78ziG');
+    '$2a$10$zwoA3n.Hyi6O/737YyPWdOr2De9GFIUesnPPWDroGg4L95dg78ziG', 'player');
 
 /* Insert corresponding tokens */
 INSERT INTO token VALUES (1303143291, 3149194563, 

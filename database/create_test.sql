@@ -6,6 +6,7 @@ CREATE TABLE account (
     user_id INT UNSIGNED,
     username VARCHAR(16) NOT NULL,
     password BINARY(60) NOT NULL,
+    account_type VARCHAR(16) NOT NULL,
     PRIMARY KEY (user_id)
 );
 

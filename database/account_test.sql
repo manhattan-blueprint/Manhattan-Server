@@ -1,8 +1,8 @@
 USE blueprint_test;
 
 /* Insert account for header token authorization */
-INSERT INTO account VALUES (3149194563, 'Will', 
-    '$2a$10$.Fbb/5zcg.Lclns7e9RyIetChJqw5W1AOgbDu/.GL747/98pK4Xr.');
+INSERT INTO account VALUES (3149194563, 'John', 
+    '$2a$10$.Fbb/5zcg.Lclns7e9RyIetChJqw5W1AOgbDu/.GL747/98pK4Xr.', 'player');
 
 INSERT INTO token VALUES (1303143291, 3149194563, 
     'ydzvGQg2EcjTTHLSVHb7JTpkSRDdd0hQu2n5YPEM4CTfnqQIrqnufSIIOWchPNSZ',

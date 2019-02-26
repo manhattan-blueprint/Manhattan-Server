@@ -52,7 +52,7 @@ Code 200:
 {
     "access":"abcdefgh",
     "refresh":"ijklmnop",
-    "type":"player"
+    "account_type":"player"
 }
 ```
 
@@ -72,7 +72,7 @@ Code 200:
 {
     "access":"abcdefgh",
     "refresh":"ijklmnop",
-    "type":"player"
+    "account_type":"player"
 }
 ```
 
@@ -92,7 +92,7 @@ Code 200:
 {
     "access":"abcdefgh",
     "refresh":"ijklmnop",
-    "type":"player"
+    "account_type":"player"
 }
 ```
 
