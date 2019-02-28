@@ -18,7 +18,7 @@ Additionally, to preload the database with developer accounts for adding and rem
 
 ### Configuration files
 
-If necessary, edit the configuration file, `conf.json`, in the `authenticate`, `inventory` and `resource` directories. The default values are:
+If necessary, edit the configuration file, `conf.json`, in the `authenticate`, `inventory`, `resource` and `progress` directories. The default values are:
 
 * `"port": 8000`
 * `"dbUsername": "root"`
@@ -31,18 +31,6 @@ This configuration:
 * Assumes credentials exist for the local MySQL database with a username of "root" and a blank password
 * Assumes a MySQL server is hosted locally **not** within a Docker container
 * The database name is set to "blueprint"
-
-The configuration file in the `resources` directory has an additional field for specifying developer account usernames, since only developer accounts can add or remove resources. The default values are:
-
-* `"developers": [`<br>
-    `{"username": "Will"},`<br>
-    `{"username": "Jay"},`<br>
-    `{"username": "Adam"},`<br>
-    `{"username": "Andrei"},`<br>
-    `{"username": "Ben"},`<br>
-    `{"username": "Eli"}]`<br>
-
-Though note developer account authentication will only work if accounts with these usernames exist in the database, see [Database Setup](#database-setup).
 
 ### Deployment
 

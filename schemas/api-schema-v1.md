@@ -182,24 +182,6 @@ Code 200:
 ```
 
 ---
-`/resources/dev` (GET) <br>
-**Description**: Check developer status for given user associated with access token.
-
-**Response**: <br>
-Cose 200:
-```json
-{
-    "developer":true
-}
-```
-or
-```json
-{
-    "developer":false
-}
-```
-
----
 `/resources` (POST) <br>
 **Description**: Add resource(s), from a developer account
 

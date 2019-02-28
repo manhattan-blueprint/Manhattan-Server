@@ -28,6 +28,10 @@ type Count struct {
 	Value int
 }
 
+type AccountType struct {
+	Value string
+}
+
 type ResourcesResReq struct {
 	Spawns []SpawnResReq `json:"spawns"`
 }
@@ -43,25 +47,17 @@ type LocationResReq struct {
 	Longitude float64 `json:"longitude"`
 }
 
-type DeveloperResponse struct {
-	Developer bool `json:"developer"`
-}
-
 const BEARER_PREFIX string = "Bearer "
 const MAX_ITEM_ID uint32 = 16
 
 // Radius to return resources from, in kilometres
 const RESOURCE_RADIUS int = 1
 
-// Developer account usernames
-var devs []Developer
-
 // Expiration in years, months, days
 var resourceExpire = [3]int{0, 1, 0}
 
 /* Initialise database connection, mux router and routes */
-func (a *App) Initialise(dbUser, dbPassword, dbHost, dbName string,
-	confDevs []Developer) error {
+func (a *App) Initialise(dbUser, dbPassword, dbHost, dbName string) error {
 	connectionString := fmt.Sprintf("%s:%s@tcp(%s)/%s", dbUser, dbPassword,
 		dbHost, dbName)
 	var err error
@@ -69,7 +65,6 @@ func (a *App) Initialise(dbUser, dbPassword, dbHost, dbName string,
 	if err != nil {
 		return err
 	}
-	devs = confDevs
 	a.Router = mux.NewRouter()
 	a.initialiseRoutes()
 	return nil
@@ -85,8 +80,6 @@ func (a *App) initialiseRoutes() {
 	prefix := "/api/v1"
 	a.Router.HandleFunc(fmt.Sprintf("%s/resources", prefix),
 		a.getResources).Methods(http.MethodGet)
-	a.Router.HandleFunc(fmt.Sprintf("%s/resources/dev", prefix),
-		a.getDeveloperStatus).Methods(http.MethodGet)
 	a.Router.HandleFunc(fmt.Sprintf("%s/resources", prefix),
 		a.addResources).Methods(http.MethodPost)
 	a.Router.HandleFunc(fmt.Sprintf("%s/resources", prefix),
@@ -152,19 +145,17 @@ func getIDFromToken(db *sql.DB, r *http.Request) (uint32, error) {
 
 /* Validate username is a developer */
 func checkDeveloper(db *sql.DB, id uint32) error {
-	stmt := "SELECT username FROM account WHERE user_id=?"
-	var dev Developer
-	err := db.QueryRow(stmt, id).Scan(&dev.Username)
+	stmt := "SELECT account_type FROM account WHERE user_id=?"
+	var accType AccountType
+	err := db.QueryRow(stmt, id).Scan(&accType.Value)
 	if err != nil {
 		return errors.New("User not found")
 	}
 
-	for i := 0; i < len(devs); i++ {
-		if devs[i].Username == dev.Username {
-			return nil
-		}
+	if accType.Value != "developer" {
+		return errors.New("User must be a developer")
 	}
-	return errors.New("User must be a developer")
+	return nil
 }
 
 /* Check sent spawn list is valid */
@@ -288,22 +279,6 @@ func (a *App) getResources(w http.ResponseWriter, r *http.Request) {
 	}
 
 	respondWithJSON(w, http.StatusOK, resRes)
-}
-
-/* Validate auth token, check user is developer and return result */
-func (a *App) getDeveloperStatus(w http.ResponseWriter, r *http.Request) {
-	id, err := getIDFromToken(a.DB, r)
-	if err != nil {
-		respondWithError(w, http.StatusUnauthorized, err.Error())
-		return
-	}
-
-	devRes := DeveloperResponse{Developer: true}
-	err = checkDeveloper(a.DB, id)
-	if err != nil {
-		devRes.Developer = false
-	}
-	respondWithJSON(w, http.StatusOK, devRes)
 }
 
 /* Validate auth token, check user is developer and add resource(s) */
