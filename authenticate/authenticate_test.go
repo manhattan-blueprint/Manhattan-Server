@@ -102,7 +102,7 @@ func TestRegisterInvalidJSON(t *testing.T) {
 	clearTokenTable(t)
 	clearAccountTable(t)
 
-	payload := []byte(`{"will":"smith"}`)
+	payload := []byte(`{"John":"Smith"}`)
 
 	req, err := http.NewRequest(http.MethodPost,
 		"/api/v1/authenticate/register", bytes.NewBuffer(payload))
@@ -137,7 +137,7 @@ func TestRegisterUser(t *testing.T) {
 	clearTokenTable(t)
 	clearAccountTable(t)
 
-	payload := []byte(`{"username":"will","password":"smith"}`)
+	payload := []byte(`{"username":"John","password":"Smith"}`)
 
 	req, err := http.NewRequest(http.MethodPost,
 		"/api/v1/authenticate/register", bytes.NewBuffer(payload))
@@ -148,7 +148,7 @@ func TestRegisterUser(t *testing.T) {
 	res := executeRequest(req)
 	checkResponseCode(t, http.StatusOK, res.Code)
 
-	// Check tokens returned are of length 64
+	// Check tokens returned are of length 64 and account type is player
 	var m map[string]string
 	json.Unmarshal(res.Body.Bytes(), &m)
 	if len(m["access"]) != 64 {
@@ -159,6 +159,9 @@ func TestRegisterUser(t *testing.T) {
 		t.Errorf("Expected refresh token of length 64. Actual length was %d",
 			len(m["refresh"]))
 	}
+	if m["account_type"] != "player" {
+		t.Errorf("Expted account type player. Actual was %s", m["account_type"])
+	}
 }
 
 /* Check existing username is not accepted for registration */
@@ -166,7 +169,7 @@ func TestRegisterExistingUsername(t *testing.T) {
 	clearTokenTable(t)
 	clearAccountTable(t)
 
-	payload := []byte(`{"username":"will","password":"smith"}`)
+	payload := []byte(`{"username":"John","password":"Smith"}`)
 
 	req, err := http.NewRequest(http.MethodPost,
 		"/api/v1/authenticate/register", bytes.NewBuffer(payload))
@@ -192,7 +195,7 @@ func TestLoginInvalidJSON(t *testing.T) {
 	clearAccountTable(t)
 
 	// First register a user
-	payload := []byte(`{"username":"will","password":"smith"}`)
+	payload := []byte(`{"username":"John","password":"Smith"}`)
 
 	req, err := http.NewRequest(http.MethodPost,
 		"/api/v1/authenticate/register", bytes.NewBuffer(payload))
@@ -204,7 +207,7 @@ func TestLoginInvalidJSON(t *testing.T) {
 	checkResponseCode(t, http.StatusOK, res.Code)
 
 	// Login with invalid JSON
-	payload = []byte(`{"will":"smith"}`)
+	payload = []byte(`{"John":"Smith"}`)
 	req, err = http.NewRequest(http.MethodPost, "/api/v1/authenticate",
 		bytes.NewBuffer(payload))
 	if err != nil {
@@ -222,7 +225,7 @@ func TestLoginUser(t *testing.T) {
 	clearAccountTable(t)
 
 	// First register a user
-	payload := []byte(`{"username":"will","password":"smith"}`)
+	payload := []byte(`{"username":"John","password":"Smith"}`)
 
 	req, err := http.NewRequest(http.MethodPost,
 		"/api/v1/authenticate/register", bytes.NewBuffer(payload))
@@ -234,7 +237,7 @@ func TestLoginUser(t *testing.T) {
 	checkResponseCode(t, http.StatusOK, res.Code)
 
 	// Login with correct credentials
-	payload = []byte(`{"username":"will","password":"smith"}`)
+	payload = []byte(`{"username":"John","password":"Smith"}`)
 
 	req, err = http.NewRequest(http.MethodPost, "/api/v1/authenticate",
 		bytes.NewBuffer(payload))
@@ -245,7 +248,7 @@ func TestLoginUser(t *testing.T) {
 	res = executeRequest(req)
 	checkResponseCode(t, http.StatusOK, res.Code)
 
-	// Check tokens returned are of length 64
+	// Check tokens returned are of length 64 and account type is player
 	var m map[string]string
 	json.Unmarshal(res.Body.Bytes(), &m)
 	if len(m["access"]) != 64 {
@@ -256,6 +259,9 @@ func TestLoginUser(t *testing.T) {
 		t.Errorf("Expected refresh token of length 64. Actual length was %d",
 			len(m["refresh"]))
 	}
+	if m["account_type"] != "player" {
+		t.Errorf("Expted account type player. Actual was %s", m["account_type"])
+	}
 }
 
 /* Check login combination of existing username but incorrect password is
@@ -265,7 +271,7 @@ func TestLoginIncorrectPassword(t *testing.T) {
 	clearAccountTable(t)
 
 	// First register a user
-	payload := []byte(`{"username":"will","password":"smith"}`)
+	payload := []byte(`{"username":"John","password":"Smith"}`)
 
 	req, err := http.NewRequest(http.MethodPost,
 		"/api/v1/authenticate/register", bytes.NewBuffer(payload))
@@ -277,7 +283,7 @@ func TestLoginIncorrectPassword(t *testing.T) {
 	checkResponseCode(t, http.StatusOK, res.Code)
 
 	// Login with incorrect password
-	payload = []byte(`{"username":"will","password":"stretch"}`)
+	payload = []byte(`{"username":"John","password":"Stretch"}`)
 
 	req, err = http.NewRequest(http.MethodPost, "/api/v1/authenticate",
 		bytes.NewBuffer(payload))
@@ -296,7 +302,7 @@ func TestLoginIncorrectUsername(t *testing.T) {
 	clearAccountTable(t)
 
 	// First register a user
-	payload := []byte(`{"username":"will","password":"smith"}`)
+	payload := []byte(`{"username":"John","password":"Smith"}`)
 
 	req, err := http.NewRequest(http.MethodPost,
 		"/api/v1/authenticate/register", bytes.NewBuffer(payload))
@@ -308,7 +314,7 @@ func TestLoginIncorrectUsername(t *testing.T) {
 	checkResponseCode(t, http.StatusOK, res.Code)
 
 	// Login with incorrect username but existing password
-	payload = []byte(`{"username":"stretch","password":"smith"}`)
+	payload = []byte(`{"username":"Stretch","password":"Smith"}`)
 
 	req, err = http.NewRequest(http.MethodPost, "/api/v1/authenticate",
 		bytes.NewBuffer(payload))
@@ -325,7 +331,7 @@ func TestRefreshInvalidJSON(t *testing.T) {
 	clearTokenTable(t)
 	clearAccountTable(t)
 
-	payload := []byte(`{"will":"smith"}`)
+	payload := []byte(`{"John":"Smith"}`)
 
 	req, err := http.NewRequest(http.MethodPost, "/api/v1/authenticate/refresh",
 		bytes.NewBuffer(payload))
@@ -391,7 +397,7 @@ func TestRefreshToken(t *testing.T) {
 	clearAccountTable(t)
 
 	// First register a user
-	payload := []byte(`{"username":"will","password":"smith"}`)
+	payload := []byte(`{"username":"John","password":"Smith"}`)
 
 	req, err := http.NewRequest(http.MethodPost,
 		"/api/v1/authenticate/register", bytes.NewBuffer(payload))
@@ -417,7 +423,7 @@ func TestRefreshToken(t *testing.T) {
 	res = executeRequest(req)
 	checkResponseCode(t, http.StatusOK, res.Code)
 
-	// Check tokens returned are of length 64
+	// Check tokens returned are of length 64 and account type is player
 	var m map[string]string
 	json.Unmarshal(res.Body.Bytes(), &m)
 	if len(m["access"]) != 64 {
@@ -428,6 +434,9 @@ func TestRefreshToken(t *testing.T) {
 		t.Errorf("Expected refresh token of length 64. Actual length was %d",
 			len(m["refresh"]))
 	}
+	if m["account_type"] != "player" {
+		t.Errorf("Expted account type player. Actual was %s", m["account_type"])
+	}
 }
 
 /* Check incorrect token is not accepted for refresh */
@@ -436,7 +445,7 @@ func TestRefreshIncorrectToken(t *testing.T) {
 	clearAccountTable(t)
 
 	// First register a user
-	payload := []byte(`{"username":"will","password":"smith"}`)
+	payload := []byte(`{"username":"John","password":"Smith"}`)
 
 	req, err := http.NewRequest(http.MethodPost,
 		"/api/v1/authenticate/register", bytes.NewBuffer(payload))
@@ -477,7 +486,7 @@ func TestRefreshRemoveToken(t *testing.T) {
 	clearAccountTable(t)
 
 	// First register a user
-	payload := []byte(`{"username":"will","password":"smith"}`)
+	payload := []byte(`{"username":"John","password":"Smith"}`)
 
 	req, err := http.NewRequest(http.MethodPost,
 		"/api/v1/authenticate/register", bytes.NewBuffer(payload))

@@ -33,7 +33,7 @@ test_inv:
 	mysql -u $(DBUSERNAME) -p < database/drop_test.sql
 
 test_res:
-	cat database/create_test.sql database/resources_test.sql | mysql -u $(DBUSERNAME) -p
+	cat database/create_test.sql database/account_test.sql | mysql -u $(DBUSERNAME) -p
 	docker build -f resources/Dockerfile_test -t resources_test resources/
 	docker run resources_test
 	mysql -u $(DBUSERNAME) -p < database/drop_test.sql
