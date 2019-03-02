@@ -160,7 +160,7 @@ func TestRegisterUser(t *testing.T) {
 			len(m["refresh"]))
 	}
 	if m["account_type"] != "player" {
-		t.Errorf("Expted account type player. Actual was %s", m["account_type"])
+		t.Errorf("Expected account type player. Actual was %s", m["account_type"])
 	}
 }
 
@@ -260,7 +260,7 @@ func TestLoginUser(t *testing.T) {
 			len(m["refresh"]))
 	}
 	if m["account_type"] != "player" {
-		t.Errorf("Expted account type player. Actual was %s", m["account_type"])
+		t.Errorf("Expected account type player. Actual was %s", m["account_type"])
 	}
 }
 
@@ -435,7 +435,7 @@ func TestRefreshToken(t *testing.T) {
 			len(m["refresh"]))
 	}
 	if m["account_type"] != "player" {
-		t.Errorf("Expted account type player. Actual was %s", m["account_type"])
+		t.Errorf("Expected account type player. Actual was %s", m["account_type"])
 	}
 }
 
