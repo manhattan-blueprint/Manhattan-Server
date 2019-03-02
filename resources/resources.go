@@ -19,7 +19,7 @@ func main() {
 	// Initialise and run
 	a := App{}
 	err = a.Initialise(config.DBUsername, config.DBPassword, config.DBHost,
-		config.DBName, config.Developers)
+		config.DBName)
 	if err != nil {
 		log.Fatal(err)
 	}

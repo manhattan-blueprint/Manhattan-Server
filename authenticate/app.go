@@ -36,9 +36,10 @@ type TokenRequest struct {
 	Refresh string `json:"refresh"`
 }
 
-type TokenResponse struct {
-	Access  string `json:"access"`
-	Refresh string `json:"refresh"`
+type AccountResponse struct {
+	Access      string `json:"access"`
+	Refresh     string `json:"refresh"`
+	AccountType string `json:"account_type"`
 }
 
 const TOKEN_SIZE int = 64
@@ -125,7 +126,8 @@ func generateRandomBytes(n int) ([]byte, error) {
 }
 
 /* Respond with auth tokens */
-func respondWithTokens(db *sql.DB, w http.ResponseWriter, id uint32) {
+func respondWithTokensAndType(db *sql.DB, w http.ResponseWriter, id uint32,
+	accountType string) {
 	tok := Token{UserID: id}
 	// Create a unique pair_id
 	var err error
@@ -163,15 +165,16 @@ func respondWithTokens(db *sql.DB, w http.ResponseWriter, id uint32) {
 		return
 	}
 
-	// Return token pair
-	tokRes := TokenResponse{
-		Access:  tok.Access,
-		Refresh: tok.Refresh,
+	// Return token pair and account type
+	accRes := AccountResponse{
+		Access:      tok.Access,
+		Refresh:     tok.Refresh,
+		AccountType: accountType,
 	}
-	respondWithJSON(w, http.StatusOK, tokRes)
+	respondWithJSON(w, http.StatusOK, accRes)
 }
 
-/* Create a new user and return auth tokens */
+/* Create a new user and return auth tokens and account type */
 func (a *App) registerUser(w http.ResponseWriter, r *http.Request) {
 	// Decode json body into account request
 	decoder := json.NewDecoder(r.Body)
@@ -189,10 +192,12 @@ func (a *App) registerUser(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	// Convert account request struct into database account struct
+	/* Convert account request struct into database account struct, and set
+	** account type to player */
 	acc := Account{
-		Username: accReq.Username,
-		Password: []byte(accReq.Password),
+		Username:    accReq.Username,
+		Password:    []byte(accReq.Password),
+		AccountType: "player",
 	}
 
 	// Check no accounts with the same username exist
@@ -228,10 +233,10 @@ func (a *App) registerUser(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	respondWithTokens(a.DB, w, acc.UserID)
+	respondWithTokensAndType(a.DB, w, acc.UserID, acc.AccountType)
 }
 
-/* Validate a user login and return auth tokens */
+/* Validate a user login and return auth tokens and account type */
 func (a *App) validateLogin(w http.ResponseWriter, r *http.Request) {
 	// Decode json body into account request
 	decoder := json.NewDecoder(r.Body)
@@ -271,8 +276,8 @@ func (a *App) validateLogin(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	// Get user_id
-	err = acc.GetID(a.DB)
+	// Get user_id and account type
+	err = acc.GetIDAndType(a.DB)
 	if err != nil {
 		switch err {
 		case sql.ErrNoRows:
@@ -284,7 +289,7 @@ func (a *App) validateLogin(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	respondWithTokens(a.DB, w, acc.UserID)
+	respondWithTokensAndType(a.DB, w, acc.UserID, acc.AccountType)
 }
 
 /* Validate a refresh token and return auth tokens */
@@ -335,6 +340,20 @@ func (a *App) refreshTokens(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
+	// Get account type
+	acc := Account{UserID: tok.UserID}
+	err = acc.GetType(a.DB)
+	if err != nil {
+		switch err {
+		case sql.ErrNoRows:
+			respondWithError(w, http.StatusInternalServerError,
+				"User not found after successful validation")
+		default:
+			respondWithError(w, http.StatusInternalServerError, err.Error())
+		}
+		return
+	}
+
 	// Remove token
 	err = tok.RemoveToken(a.DB)
 	if err != nil {
@@ -342,7 +361,7 @@ func (a *App) refreshTokens(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	respondWithTokens(a.DB, w, tok.UserID)
+	respondWithTokensAndType(a.DB, w, acc.UserID, acc.AccountType)
 }
 
 /* Return item schema */

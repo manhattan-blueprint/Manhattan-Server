@@ -31,8 +31,7 @@ func TestMain(m *testing.M) {
 	// Initialise the router and database connection
 	testA = App{}
 	err = testA.Initialise(testConfig.DBUsername, testConfig.DBPassword,
-		testConfig.DBHost, fmt.Sprintf("%s_test", testConfig.DBName),
-		testConfig.Developers)
+		testConfig.DBHost, fmt.Sprintf("%s_test", testConfig.DBName))
 	if err != nil {
 		log.Fatal(err)
 	}
@@ -358,56 +357,6 @@ func TestAddGetMultipleResources(t *testing.T) {
 	}
 	if !(resources.Spawns[1].ItemID == 1 || resources.Spawns[1].ItemID == 2) {
 		t.Errorf("Incorrect resources returned")
-	}
-}
-
-/* Check developer status is correctly returned */
-func TestGetDeveloperStatus(t *testing.T) {
-	clearResourcesTable(t)
-
-	// Check developer status of normal account
-	req, err := http.NewRequest(http.MethodGet, "/api/v1/resources/dev",
-		nil)
-	req.Header.Set("Authorization", NORMAL_ACCESS_TOKEN)
-	if err != nil {
-		t.Errorf("Failed to create request")
-	}
-
-	res := executeRequest(req)
-	checkResponseCode(t, http.StatusOK, res.Code)
-
-	// Check returned developer status is false
-	decoder := json.NewDecoder(res.Body)
-	var devRes DeveloperResponse
-	err = decoder.Decode(&devRes)
-	if err != nil {
-		t.Errorf("Failed to decode developer response")
-	}
-	if devRes.Developer != false {
-		t.Errorf("Expected developer status to be false. Actual was %t",
-			devRes.Developer)
-	}
-
-	// Check developer status of developer account
-	req, err = http.NewRequest(http.MethodGet, "/api/v1/resources/dev",
-		nil)
-	req.Header.Set("Authorization", DEV_ACCESS_TOKEN)
-	if err != nil {
-		t.Errorf("Failed to create request")
-	}
-
-	res = executeRequest(req)
-	checkResponseCode(t, http.StatusOK, res.Code)
-
-	// Check returned developer status is true
-	decoder = json.NewDecoder(res.Body)
-	err = decoder.Decode(&devRes)
-	if err != nil {
-		t.Errorf("Failed to decode developer response")
-	}
-	if devRes.Developer != true {
-		t.Errorf("Expected developer status to be true. Actual was %t",
-			devRes.Developer)
 	}
 }
 

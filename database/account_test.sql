@@ -1,10 +1,23 @@
 USE blueprint_test;
 
-/* Insert account for header token authorization */
+/* Insert a developer account and a normal account */
 INSERT INTO account VALUES (3149194563, 'Will', 
-    '$2a$10$.Fbb/5zcg.Lclns7e9RyIetChJqw5W1AOgbDu/.GL747/98pK4Xr.');
+    '$2a$10$.Fbb/5zcg.Lclns7e9RyIetChJqw5W1AOgbDu/.GL747/98pK4Xr.', 'developer'), 
+    (1012560868, 'Tilo',
+    '$2a$10$09EOLdVcbDqKP1Dzy7YRReviHRH5CMbfmM4EUfDDgXW0LqHBWU1Y6', 'lecturer'),
+    (2121631167, 'John', 
+    '$2a$10$zwoA3n.Hyi6O/737YyPWdOr2De9GFIUesnPPWDroGg4L95dg78ziG', 'player');
 
+/* Insert corresponding tokens */
 INSERT INTO token VALUES (1303143291, 3149194563, 
     'ydzvGQg2EcjTTHLSVHb7JTpkSRDdd0hQu2n5YPEM4CTfnqQIrqnufSIIOWchPNSZ',
     'IgPoQn3-sf_nxJY3XPwETbkKXHXGQ2dFr9laSSe8Ps4jrQXOJ6eOkCVk5I6lsmX1',
+    9223372036854775807, 9223372036854775807), 
+    (2216610549, 1012560868,
+    'V3qk9x4oEs4Gc6h9MpT-kAnDNFxPdIix19MV-lPDCZUxGTVKrH1Hhz4drVar4rSw',
+    'lMARd4fnU7HirBJ6JO7XJliBAXXTn5fktwhHPgr-oVRZnL9648Az25GVNceXk2BD',
+    9223372036854775807, 9223372036854775807),
+    (3793651081, 2121631167,
+    'CwlBrHSOzAC2NMLDREmeLeSdAeGMWcczp7KH2Ks9hWJtsMAey82kdRlggoqG0Yjr',
+    'IW-00NFzGSYyZ20XduHn6IU3P1LCMiMdjUYz9ZqVtDn2HcswpTO-tUvclZlb9hVs',
     9223372036854775807, 9223372036854775807);

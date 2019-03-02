@@ -3,13 +3,5 @@
     "dbUsername": "root",
     "dbPassword": "",
     "dbHost": "host.docker.internal",
-    "dbName": "blueprint",
-    "developers": [
-        {"username": "Will"},
-        {"username": "Jay"},
-        {"username": "Adam"},
-        {"username": "Andrei"},
-        {"username": "Ben"},
-        {"username": "Eli"}
-    ]
+    "dbName": "blueprint"
 }
