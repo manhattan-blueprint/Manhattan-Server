@@ -99,7 +99,7 @@ refresh_token | String | The previous refresh token
 **Response**: <br>
 ```json
 {
-    "items": [
+    "items":[
         {"item_id": 0, "quantity": 1},
         {"item_id": 1, "quantity": 3},
         {"item_id": 2, "quantity": 300},
@@ -152,22 +152,22 @@ long | Float | Longitude coordinate
 **Response**: <br>
 ```json
 {
-    "spawns": [
+    "spawns":[
         {
-            "item_id": 1, 
+            "item_id":1, 
             "location": {
-                "latitude": 50.12345678, 
-                "longitude": -2.61234567
+                "latitude":50.12345678, 
+                "longitude":-2.61234567
             },
-            "quantity": 3
+            "quantity":3
         },
         {
-            "item_id": 2, 
+            "item_id":2, 
             "location": {
-                "latitude": 50.87654321, 
-                "longitude": -2.67654321
+                "latitude":50.87654321, 
+                "longitude":-2.67654321
             },
-            "quantity": 5
+            "quantity":5
         }
     ]
 }
@@ -202,22 +202,22 @@ Example:
 
 ```json
 {
-    "spawns": [
+    "spawns":[
         {
-            "item_id": 1, 
+            "item_id":1, 
             "location": {
-                "latitude": 50.12345678, 
-                "longitude": -2.61234567
+                "latitude":50.12345678, 
+                "longitude":-2.61234567
             },
-            "quantity": 3
+            "quantity":3
         },
         {
-            "item_id": 2, 
+            "item_id":2, 
             "location": {
-                "latitude": 50.87654321, 
-                "longitude": -2.67654321
+                "latitude":50.87654321, 
+                "longitude":-2.67654321
             },
-            "quantity": 5
+            "quantity":5
         }
     ]
 }
@@ -257,22 +257,22 @@ Example:
 
 ```json
 {
-    "spawns": [
+    "spawns":[
         {
-            "item_id": 1, 
+            "item_id": , 
             "location": {
-                "latitude": 50.12345678, 
-                "longitude": -2.61234567
+                "latitude":50.12345678, 
+                "longitude":-2.61234567
             },
-            "quantity": 3  
+            "quantity":3  
         },
         {
-            "item_id": 2, 
+            "item_id":2, 
             "location": {
-                "latitude": 50.87654321, 
-                "longitude": -2.67654321
+                "latitude":50.87654321, 
+                "longitude":-2.67654321
             },
-            "quantity": 5  
+            "quantity":5  
         }
     ]
 }
@@ -290,10 +290,10 @@ Example:
 **Response**: <br>
 ```json
 {
-    "blueprints": [
-        {"item_id": 0},
-        {"item_id": 1},
-        {"item_id": 2},
+    "blueprints":[
+        {"item_id":0},
+        {"item_id":1},
+        {"item_id":2},
     ]
 }
 ```
@@ -317,4 +317,28 @@ item_id  | Int | The blueprint item_id to add (1 - 16 inclusive)
 **Response**: <br>
 ```json
 {}
+```
+
+---
+`progress/leaderboard` (GET) <br>
+**Description**: Fetch all player progress, i.e. all blueprints completed, from a developer account. Note this is unordered
+
+**Response**: <br>
+```json
+{
+    "progress":[
+        {
+            "username":"John",
+            "item_id":4
+        },
+        {
+            "username":"Leo",
+            "item_id":12
+        },
+        {
+            "username":"John",
+            "item_id":8
+        }
+    ]
+}
 ```
