@@ -16,6 +16,8 @@ Additionally, to preload the database with developer accounts for adding and rem
 
 `> mysql -u DATABASE_USERNAME -p < database/dev.sql`
 
+This script also adds test accounts for each account type: `developer`, `lecturer` and `player`.
+
 ### Configuration files
 
 If necessary, edit the configuration file, `conf.json`, in the `authenticate`, `inventory`, `resource` and `progress` directories. The default values are:
@@ -29,7 +31,7 @@ If necessary, edit the configuration file, `conf.json`, in the `authenticate`, `
 This configuration:
 * Opens port 8000 of the Docker container
 * Assumes credentials exist for the local MySQL database with a username of "root" and a blank password
-* Assumes a MySQL server is hosted locally **not** within a Docker container
+* Assumes a MySQL server is hosted locally **not** within a Docker container, note this is OS specific
 * The database name is set to "blueprint"
 
 ### Deployment
