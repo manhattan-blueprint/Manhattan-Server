@@ -5,8 +5,8 @@ import (
 	"encoding/json"
 	"errors"
 	"fmt"
-	"io/ioutil"
 	"net/http"
+	"os"
 	"strconv"
 	"strings"
 
@@ -44,11 +44,31 @@ type LeaderboardElementResponse struct {
 	ItemID   uint32 `json:"item_id"`
 }
 
+type ItemSchema struct {
+	Items []SchemaItem `json:"items"`
+}
+
+type SchemaItem struct {
+	ItemID    uint32                  `json:"item_id"`
+	Name      string                  `json:"name"`
+	Type      uint32                  `json:"type"`
+	Blueprint []SchemaBlueprintRecipe `json:"blueprint"`
+	MachineID uint32                  `json:"machine_id"`
+	Recipe    []SchemaBlueprintRecipe `json:"recipe`
+}
+
+type SchemaBlueprintRecipe struct {
+	ItemID   uint32 `json:"item_id"`
+	Quantity uint32 `json:"quantity"`
+}
+
 const BEARER_PREFIX string = "Bearer "
 const MAX_ITEM_ID uint32 = 16
 const ITEM_SCHEMA string = "serve/item-schema-v1.json"
 
-/* Initialise database connection, mux router and routes */
+var itemSchema ItemSchema
+
+/* Initialise database connection, mux router, routes and item schema */
 func (a *App) Initialise(dbUser, dbPassword, dbHost, dbName string) error {
 	connectionString := fmt.Sprintf("%s:%s@tcp(%s)/%s", dbUser, dbPassword,
 		dbHost, dbName)
@@ -59,12 +79,32 @@ func (a *App) Initialise(dbUser, dbPassword, dbHost, dbName string) error {
 	}
 	a.Router = mux.NewRouter()
 	a.initialiseRoutes()
+
+	err = GetItemSchema(ITEM_SCHEMA)
+	if err != nil {
+		return err
+	}
+
 	return nil
 }
 
 /* Run the server, listening on the given port */
 func (a *App) Run(port int) error {
 	return http.ListenAndServe(fmt.Sprintf(":%s", strconv.Itoa(port)), a.Router)
+}
+
+func GetItemSchema(filename string) error {
+	file, err := os.Open(filename)
+	if err != nil {
+		return err
+	}
+	defer file.Close()
+	decoder := json.NewDecoder(file)
+	err = decoder.Decode(&itemSchema)
+	if err != nil {
+		return err
+	}
+	return nil
 }
 
 /* Map routes to functions */
@@ -88,7 +128,10 @@ func respondWithError(w http.ResponseWriter, code int, message string) {
 
 /* Respond with a JSON */
 func respondWithJSON(w http.ResponseWriter, code int, payload interface{}) {
-	response, _ := json.Marshal(payload)
+	response, err := json.Marshal(payload)
+	if err != nil {
+		respondWithError(w, http.StatusInternalServerError, err.Error())
+	}
 	w.Header().Set("Content-Type", "application/json")
 	w.WriteHeader(code)
 	w.Write(response)
@@ -293,11 +336,5 @@ func (a *App) getLeaderboard(w http.ResponseWriter, r *http.Request) {
 
 /* Return item schema */
 func (a *App) getItemSchema(w http.ResponseWriter, r *http.Request) {
-	response, err := ioutil.ReadFile(ITEM_SCHEMA)
-	if err != nil {
-		respondWithError(w, http.StatusInternalServerError, err.Error())
-	}
-	w.Header().Set("Content-Type", "application/json")
-	w.WriteHeader(http.StatusOK)
-	w.Write(response)
+	respondWithJSON(w, http.StatusOK, itemSchema)
 }
