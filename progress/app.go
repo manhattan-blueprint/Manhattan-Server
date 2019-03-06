@@ -201,13 +201,19 @@ func checkValidProgress(pro Progress) error {
 	if len(pro.Blueprints) <= 0 {
 		return errors.New("Empty blueprint list")
 	}
+	// Check IDs exist and are blueprints
 	for i := 0; i < len(pro.Blueprints); i++ {
-		/* Does not check if item ID is actually a blueprint, only if valid item ID.
-		** Ideally this would check against the item schema, to see if the item
-		** ID(s) sent have the correct type
-		 */
-		if pro.Blueprints[i].ItemID <= 0 || pro.Blueprints[i].ItemID > MAX_ITEM_ID {
-			return errors.New("Invalid item ID in list")
+		found := false
+		for j := 0; j < len(itemSchema.Items); j++ {
+			if pro.Blueprints[i].ItemID == itemSchema.Items[j].ItemID {
+				if itemSchema.Items[j].Type == 2 || itemSchema.Items[j].Type == 3 ||
+					itemSchema.Items[j].Type == 5 {
+					found = true
+				}
+			}
+		}
+		if !found {
+			return errors.New("Invalid ID in blueprint list")
 		}
 	}
 	return nil
