@@ -5,15 +5,12 @@ import (
 	"encoding/json"
 	"errors"
 	"fmt"
-	"io/ioutil"
 	"log"
 	"net/http"
 	"net/http/httptest"
 	"os"
 	"testing"
 )
-
-const MAX_ITEM_ID int = 16
 
 var testA App
 var testConfig Configuration
@@ -520,26 +517,4 @@ func TestRefreshRemoveToken(t *testing.T) {
 	}
 	res = executeRequest(req)
 	checkResponseCode(t, http.StatusUnauthorized, res.Code)
-}
-
-/* Check item schema is returned */
-func TestGetItemSchema(t *testing.T) {
-	req, err := http.NewRequest(http.MethodGet, "/api/v1/item-schema", nil)
-	if err != nil {
-		t.Errorf("Failed to create request")
-	}
-
-	res := executeRequest(req)
-	checkResponseCode(t, http.StatusOK, res.Code)
-
-	// Check correct JSON is returned
-	var m map[string]string
-	json.Unmarshal(res.Body.Bytes(), &m)
-	itemSchema, err := ioutil.ReadFile(ITEM_SCHEMA)
-	if err != nil {
-		t.Errorf("Failed to read item schema file")
-	}
-	if !bytes.Equal(res.Body.Bytes(), itemSchema) {
-		t.Errorf("JSON returned does not match the item schema")
-	}
 }

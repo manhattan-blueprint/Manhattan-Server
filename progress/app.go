@@ -5,6 +5,7 @@ import (
 	"encoding/json"
 	"errors"
 	"fmt"
+	"io/ioutil"
 	"net/http"
 	"strconv"
 	"strings"
@@ -45,6 +46,7 @@ type LeaderboardElementResponse struct {
 
 const BEARER_PREFIX string = "Bearer "
 const MAX_ITEM_ID uint32 = 16
+const ITEM_SCHEMA string = "serve/item-schema-v1.json"
 
 /* Initialise database connection, mux router and routes */
 func (a *App) Initialise(dbUser, dbPassword, dbHost, dbName string) error {
@@ -74,6 +76,9 @@ func (a *App) initialiseRoutes() {
 		a.addProgress).Methods(http.MethodPost)
 	a.Router.HandleFunc(fmt.Sprintf("%s/progress/leaderboard", prefix),
 		a.getLeaderboard).Methods(http.MethodGet)
+	// Serve item schema
+	a.Router.HandleFunc(fmt.Sprintf("%s/item-schema", prefix),
+		a.getItemSchema).Methods(http.MethodGet)
 }
 
 /* Respond with a error JSON */
@@ -284,4 +289,15 @@ func (a *App) getLeaderboard(w http.ResponseWriter, r *http.Request) {
 	}
 
 	respondWithJSON(w, http.StatusOK, leadRes)
+}
+
+/* Return item schema */
+func (a *App) getItemSchema(w http.ResponseWriter, r *http.Request) {
+	response, err := ioutil.ReadFile(ITEM_SCHEMA)
+	if err != nil {
+		respondWithError(w, http.StatusInternalServerError, err.Error())
+	}
+	w.Header().Set("Content-Type", "application/json")
+	w.WriteHeader(http.StatusOK)
+	w.Write(response)
 }

@@ -6,7 +6,6 @@ import (
 	"encoding/base64"
 	"encoding/json"
 	"fmt"
-	"io/ioutil"
 	mrand "math/rand"
 	"net/http"
 	"strconv"
@@ -43,7 +42,6 @@ type AccountResponse struct {
 }
 
 const TOKEN_SIZE int = 64
-const ITEM_SCHEMA string = "serve/item-schema-v1.json"
 
 // Expiration in years, months, days
 var accessExpire = [3]int{0, 1, 0}
@@ -77,9 +75,6 @@ func (a *App) initialiseRoutes() {
 		a.validateLogin).Methods(http.MethodPost)
 	a.Router.HandleFunc(fmt.Sprintf("%s/authenticate/refresh", prefix),
 		a.refreshTokens).Methods(http.MethodPost)
-	// Serve item schema
-	a.Router.HandleFunc(fmt.Sprintf("%s/item-schema", prefix),
-		a.getItemSchema).Methods(http.MethodGet)
 }
 
 /* Respond with a error JSON */
@@ -362,15 +357,4 @@ func (a *App) refreshTokens(w http.ResponseWriter, r *http.Request) {
 	}
 
 	respondWithTokensAndType(a.DB, w, acc.UserID, acc.AccountType)
-}
-
-/* Return item schema */
-func (a *App) getItemSchema(w http.ResponseWriter, r *http.Request) {
-	response, err := ioutil.ReadFile(ITEM_SCHEMA)
-	if err != nil {
-		respondWithError(w, http.StatusInternalServerError, err.Error())
-	}
-	w.Header().Set("Content-Type", "application/json")
-	w.WriteHeader(http.StatusOK)
-	w.Write(response)
 }

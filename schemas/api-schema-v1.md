@@ -11,6 +11,7 @@
 * All requests, aside from Authentication and item schema, must contain the access token as a header
 `Authorization: Bearer <token>`, where each token is a 64 character string
 * All errors will be a JSON of the form `"error":"Example error"`
+* The item schema is served from the progress service, so uses the 8003 port
 
 # Item Schema
 
