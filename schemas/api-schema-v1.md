@@ -326,7 +326,7 @@ item_id  | Int | The blueprint item_id to add (1 - 16 inclusive)
 **Response**: <br>
 ```json
 {
-    "progress":[
+    "leaderboard":[
         {
             "username":"John",
             "item_id":4

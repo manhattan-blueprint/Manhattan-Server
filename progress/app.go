@@ -22,12 +22,25 @@ type ID struct {
 	Value uint32
 }
 
+type AccountType struct {
+	Value string
+}
+
 type ProgressResponse struct {
 	Blueprints []BlueprintResponse `json:"blueprints"`
 }
 
 type BlueprintResponse struct {
 	ItemID uint32 `json:"item_id"`
+}
+
+type LeaderboardResponse struct {
+	LeaderboardElements []LeaderboardElementResponse `json:"leaderboard"`
+}
+
+type LeaderboardElementResponse struct {
+	Username string `json:"username"`
+	ItemID   uint32 `json:"item_id"`
 }
 
 const BEARER_PREFIX string = "Bearer "
@@ -59,6 +72,8 @@ func (a *App) initialiseRoutes() {
 		a.getProgress).Methods(http.MethodGet)
 	a.Router.HandleFunc(fmt.Sprintf("%s/progress", prefix),
 		a.addProgress).Methods(http.MethodPost)
+	a.Router.HandleFunc(fmt.Sprintf("%s/progress/leaderboard", prefix),
+		a.getLeaderboard).Methods(http.MethodGet)
 }
 
 /* Respond with a error JSON */
@@ -116,6 +131,21 @@ func getIDFromToken(db *sql.DB, r *http.Request) (uint32, error) {
 		}
 	}
 	return id.Value, nil
+}
+
+/* Validate user_id is a developer */
+func checkDeveloper(db *sql.DB, id uint32) error {
+	stmt := "SELECT account_type FROM account WHERE user_id=?"
+	var accType AccountType
+	err := db.QueryRow(stmt, id).Scan(&accType.Value)
+	if err != nil {
+		return errors.New("User not found")
+	}
+
+	if accType.Value != "developer" {
+		return errors.New("User must be a developer")
+	}
+	return nil
 }
 
 /* Check sent blueprint list is valid */
@@ -210,4 +240,48 @@ func (a *App) addProgress(w http.ResponseWriter, r *http.Request) {
 	}
 
 	respondWithEmptyJSON(w, http.StatusOK)
+}
+
+/* Return all player progress */
+func (a *App) getLeaderboard(w http.ResponseWriter, r *http.Request) {
+	id, err := getIDFromToken(a.DB, r)
+	if err != nil {
+		respondWithError(w, http.StatusUnauthorized, err.Error())
+		return
+	}
+
+	err = checkDeveloper(a.DB, id)
+	if err != nil {
+		respondWithError(w, http.StatusUnauthorized, err.Error())
+		return
+	}
+
+	stmt := "SELECT account.username, progress.item_id FROM progress INNER JOIN account ON progress.user_id = account.user_id"
+
+	rows, err := a.DB.Query(stmt)
+	if err != nil {
+		respondWithError(w, http.StatusInternalServerError, err.Error())
+		return
+	}
+	defer rows.Close()
+
+	var leadRes LeaderboardResponse
+	leadRes.LeaderboardElements = make([]LeaderboardElementResponse, 0)
+	for rows.Next() {
+		var leadEleRes LeaderboardElementResponse
+		err = rows.Scan(&leadEleRes.Username, &leadEleRes.ItemID)
+		if err != nil {
+			respondWithError(w, http.StatusInternalServerError, err.Error())
+			return
+		}
+		leadRes.LeaderboardElements = append(leadRes.LeaderboardElements, leadEleRes)
+	}
+	// Handle any errors encountered during iteration
+	err = rows.Err()
+	if err != nil {
+		respondWithError(w, http.StatusInternalServerError, err.Error())
+		return
+	}
+
+	respondWithJSON(w, http.StatusOK, leadRes)
 }
