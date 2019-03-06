@@ -339,5 +339,5 @@ func TestGetItemSchema(t *testing.T) {
 	res := executeRequest(req)
 	checkResponseCode(t, http.StatusOK, res.Code)
 
-	/* This really should check the returned JSON matches the item schema file */
+	/* TODO: This really should check the returned JSON matches the item schema file */
 }

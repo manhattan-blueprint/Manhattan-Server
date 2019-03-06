@@ -1,6 +1,6 @@
 USE blueprint_test;
 
-/* Insert a developer, lecturer and playeraccount */
+/* Insert a developer, lecturer and player account */
 INSERT INTO account VALUES (3149194563, 'Will', 
     '$2a$10$.Fbb/5zcg.Lclns7e9RyIetChJqw5W1AOgbDu/.GL747/98pK4Xr.', 'developer'), 
     (1012560868, 'Tilo',
