@@ -66,7 +66,16 @@ const BEARER_PREFIX string = "Bearer "
 const MAX_ITEM_ID uint32 = 16
 const ITEM_SCHEMA string = "serve/item-schema-v1.json"
 
+const (
+	TYPE_PRIMARY_RESOURCE      = 1
+	TYPE_BLUEPRINT_PLACEABLE   = 2
+	TYPE_BLUEPRINT_UNPLACEABLE = 3
+	TYPE_MACHINERY_UNPLACEABLE = 4
+	TYPE_BLUEPRINT_GOAL        = 5
+)
+
 var itemSchema ItemSchema
+var itemTypeMap map[uint32]uint32
 
 /* Initialise database connection, mux router, routes and item schema */
 func (a *App) Initialise(dbUser, dbPassword, dbHost, dbName string) error {
@@ -104,6 +113,13 @@ func GetItemSchema(filename string) error {
 	if err != nil {
 		return err
 	}
+
+	// Build type map
+	itemTypeMap = make(map[uint32]uint32)
+	for i := 0; i < len(itemSchema.Items); i++ {
+		itemTypeMap[itemSchema.Items[i].ItemID] = itemSchema.Items[i].Type
+	}
+
 	return nil
 }
 
@@ -203,17 +219,15 @@ func checkValidProgress(pro Progress) error {
 	}
 	// Check IDs exist and are blueprints
 	for i := 0; i < len(pro.Blueprints); i++ {
-		found := false
-		for j := 0; j < len(itemSchema.Items); j++ {
-			if pro.Blueprints[i].ItemID == itemSchema.Items[j].ItemID {
-				if itemSchema.Items[j].Type == 2 || itemSchema.Items[j].Type == 3 ||
-					itemSchema.Items[j].Type == 5 {
-					found = true
-				}
+		value, ok := itemTypeMap[pro.Blueprints[i].ItemID]
+		if ok {
+			if !(value == TYPE_BLUEPRINT_PLACEABLE ||
+				value == TYPE_BLUEPRINT_UNPLACEABLE ||
+				value == TYPE_BLUEPRINT_GOAL) {
+				return errors.New("Invalid ID in blueprint list")
 			}
-		}
-		if !found {
-			return errors.New("Invalid ID in blueprint list")
+		} else {
+			return errors.New("Out of range ID in blueprint list")
 		}
 	}
 	return nil
