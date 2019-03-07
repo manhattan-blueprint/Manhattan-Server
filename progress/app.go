@@ -132,6 +132,10 @@ func (a *App) initialiseRoutes() {
 		a.addProgress).Methods(http.MethodPost)
 	a.Router.HandleFunc(fmt.Sprintf("%s/progress/leaderboard", prefix),
 		a.getLeaderboard).Methods(http.MethodGet)
+	a.Router.HandleFunc(fmt.Sprintf("%s/progress/desktop-state", prefix),
+		a.addDesktopState).Methods(http.MethodPost)
+	a.Router.HandleFunc(fmt.Sprintf("%s/progress/desktop-state", prefix),
+		a.getDesktopState).Methods(http.MethodGet)
 	// Serve item schema
 	a.Router.HandleFunc(fmt.Sprintf("%s/item-schema", prefix),
 		a.getItemSchema).Methods(http.MethodGet)
@@ -357,4 +361,26 @@ func (a *App) getLeaderboard(w http.ResponseWriter, r *http.Request) {
 /* Return item schema */
 func (a *App) getItemSchema(w http.ResponseWriter, r *http.Request) {
 	respondWithJSON(w, http.StatusOK, itemSchema)
+}
+
+/* Add player desktop state as a JSON */
+func (a *App) addDesktopState(w http.ResponseWriter, r *http.Request) {
+	_, err := getIDFromToken(a.DB, r)
+	if err != nil {
+		respondWithError(w, http.StatusUnauthorized, err.Error())
+		return
+	}
+
+	respondWithError(w, http.StatusNotImplemented, "Not yet implemented")
+}
+
+/* Get player desktop state as a JSON */
+func (a *App) getDesktopState(w http.ResponseWriter, r *http.Request) {
+	_, err := getIDFromToken(a.DB, r)
+	if err != nil {
+		respondWithError(w, http.StatusUnauthorized, err.Error())
+		return
+	}
+
+	respondWithError(w, http.StatusNotImplemented, "Not yet implemented")
 }
