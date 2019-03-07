@@ -143,7 +143,7 @@ func getIDFromToken(db *sql.DB, r *http.Request) (uint32, error) {
 	return id.Value, nil
 }
 
-/* Validate username is a developer */
+/* Validate user_id is a developer */
 func checkDeveloper(db *sql.DB, id uint32) error {
 	stmt := "SELECT account_type FROM account WHERE user_id=?"
 	var accType AccountType
@@ -253,12 +253,12 @@ func (a *App) getResources(w http.ResponseWriter, r *http.Request) {
 		respondWithError(w, http.StatusInternalServerError, err.Error())
 		return
 	}
+	defer rows.Close()
 
 	// Convert result rows into resources response structure
 	var resRes ResourcesResReq
 	// Handle no resources case
 	resRes.Spawns = make([]SpawnResReq, 0)
-	defer rows.Close()
 	for rows.Next() {
 		var spawnRes SpawnResReq
 		var locRes LocationResReq
