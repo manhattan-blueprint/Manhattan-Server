@@ -2,7 +2,7 @@
   "items":[
     {
       "item_id":1,
-      "name":"wood",
+      "name":"Wood",
       "type":1,
       "blueprint":[],
       "machine_id":null,
@@ -11,7 +11,7 @@
     },
     {
       "item_id":2,
-      "name":"stone",
+      "name":"Stone",
       "type":1,
       "blueprint":[],
       "machine_id":null,
@@ -20,7 +20,7 @@
     },
     {
       "item_id":3,
-      "name":"clay",
+      "name":"Clay",
       "type":1,
       "blueprint":[],
       "machine_id":null,
@@ -29,7 +29,7 @@
     },
     {
       "item_id":4,
-      "name":"iron ore",
+      "name":"Iron ore",
       "type":1,
       "blueprint":[],
       "machine_id":null,
@@ -38,7 +38,7 @@
     },
     {
       "item_id":5,
-      "name":"copper ore",
+      "name":"Copper ore",
       "type":1,
       "blueprint":[],
       "machine_id":null,
@@ -47,7 +47,7 @@
     },
     {
       "item_id":6,
-      "name":"rubber",
+      "name":"Rubber",
       "type":1,
       "blueprint":[],
       "machine_id":null,
@@ -56,7 +56,7 @@
     },
     {
       "item_id":7,
-      "name":"diamond",
+      "name":"Diamond",
       "type":1,
       "blueprint":[],
       "machine_id":null,
@@ -65,7 +65,7 @@
     },
     {
       "item_id":8,
-      "name":"sand",
+      "name":"Sand",
       "type":1,
       "blueprint":[],
       "machine_id":null,
@@ -74,7 +74,7 @@
     },
     {
       "item_id":9,
-      "name":"silica ore",
+      "name":"Silica ore",
       "type":1,
       "blueprint":[],
       "machine_id":null,
@@ -83,7 +83,7 @@
     },
     {
       "item_id":10,
-      "name":"quartz",
+      "name":"Quartz",
       "type":1,
       "blueprint":[],
       "machine_id":null,
@@ -92,7 +92,7 @@
     },
     {
       "item_id":11,
-      "name":"furnace",
+      "name":"Furnace",
       "type":2,
       "blueprint":[
         {
@@ -117,7 +117,7 @@
     },
     {
       "item_id":12,
-      "name":"charcoal",
+      "name":"Charcoal",
       "type":3,
       "blueprint":[],
       "machine_id":11,
@@ -131,7 +131,7 @@
     },
     {
       "item_id":13,
-      "name":"steel",
+      "name":"Steel",
       "type":3,
       "blueprint":[],
       "machine_id":11,
@@ -149,7 +149,7 @@
     },
     {
       "item_id":14,
-      "name":"copper",
+      "name":"Copper",
       "type":3,
       "blueprint":[],
       "machine_id":11,
@@ -163,7 +163,7 @@
     },
     {
       "item_id":15,
-      "name":"iron",
+      "name":"Iron",
       "type":3,
       "blueprint":[],
       "machine_id":11,
@@ -177,7 +177,7 @@
     },
     {
       "item_id":16,
-      "name":"glass",
+      "name":"Glass",
       "type":3,
       "blueprint":[],
       "machine_id":11,
@@ -191,7 +191,7 @@
     },
     {
       "item_id":17,
-      "name":"silicon wafer",
+      "name":"Silicon wafer",
       "type":3,
       "blueprint":[],
       "machine_id":11,
@@ -205,7 +205,7 @@
     },
     {
       "item_id":18,
-      "name":"fibreglass",
+      "name":"Fibreglass",
       "type":4,
       "blueprint":[
         {
@@ -223,7 +223,7 @@
     },
     {
       "item_id":19,
-      "name":"machine base",
+      "name":"Machine base",
       "type":4,
       "blueprint":[
         {
@@ -237,7 +237,7 @@
     },
     {
       "item_id":20,
-      "name":"wire drawer",
+      "name":"Wire drawer",
       "type":2,
       "blueprint":[
         {
@@ -266,7 +266,7 @@
     },
     {
       "item_id":21,
-      "name":"uninsulated wire",
+      "name":"Uninsulated wire",
       "type":3,
       "blueprint":[],
       "machine_id":20,
@@ -280,7 +280,7 @@
     },
     {
       "item_id":22,
-      "name":"insulated wire",
+      "name":"Insulated wire",
       "type":2,
       "blueprint":[
         {
@@ -298,7 +298,7 @@
     },
     {
       "item_id":23,
-      "name":"copper coil",
+      "name":"Copper coil",
       "type":4,
       "blueprint":[
         {
@@ -312,7 +312,7 @@
     },
     {
       "item_id":24,
-      "name":"motor",
+      "name":"Motor",
       "type":4,
       "blueprint":[
         {
@@ -330,7 +330,7 @@
     },
     {
       "item_id":25,
-      "name":"solar panel",
+      "name":"Solar panel",
       "type":2,
       "blueprint":[
         {
@@ -352,7 +352,7 @@
     },
     {
       "item_id":26,
-      "name":"welder",
+      "name":"Welder",
       "type":2,
       "blueprint":[
         {
@@ -378,7 +378,7 @@
     },
     {
       "item_id":27,
-      "name":"satellite dish frame",
+      "name":"Satellite dish frame",
       "type":3,
       "blueprint":[],
       "machine_id":26,
@@ -392,7 +392,7 @@
     },
     {
       "item_id":28,
-      "name":"satellite dish",
+      "name":"Satellite dish",
       "type":4,
       "blueprint":[
         {
@@ -414,7 +414,7 @@
     },
     {
       "item_id":29,
-      "name":"circuit printer",
+      "name":"Circuit printer",
       "type":2,
       "blueprint":[
         {
@@ -440,7 +440,7 @@
     },
     {
       "item_id":30,
-      "name":"printed circuit board",
+      "name":"Printed circuit board",
       "type":3,
       "blueprint":[],
       "machine_id":29,
@@ -458,7 +458,7 @@
     },
     {
       "item_id":31,
-      "name":"transmitter receiver",
+      "name":"Transmitter receiver",
       "type":4,
       "blueprint":[
         {
@@ -476,7 +476,7 @@
     },
     {
       "item_id":32,
-      "name":"electricity",
+      "name":"Electricity",
       "type":5,
       "blueprint":[],
       "machine_id":null,
