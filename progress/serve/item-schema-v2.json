@@ -241,12 +241,12 @@
       "type":2,
       "blueprint":[
         {
-          "item_id":2,
-          "quantity":2
-        },
-        {
           "item_id":11,
           "quantity":1
+        },
+        {
+          "item_id":13,
+          "quantity":2
         },
         {
           "item_id":19,
