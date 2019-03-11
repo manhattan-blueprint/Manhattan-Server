@@ -63,15 +63,15 @@ type SchemaBlueprintRecipe struct {
 }
 
 const BEARER_PREFIX string = "Bearer "
-const MAX_ITEM_ID uint32 = 16
-const ITEM_SCHEMA string = "serve/item-schema-v1.json"
+const MAX_ITEM_ID uint32 = 32
+const ITEM_SCHEMA string = "serve/item-schema-v2.json"
 
 const (
 	TYPE_PRIMARY_RESOURCE      = 1
 	TYPE_BLUEPRINT_PLACEABLE   = 2
-	TYPE_BLUEPRINT_UNPLACEABLE = 3
-	TYPE_MACHINERY_UNPLACEABLE = 4
-	TYPE_BLUEPRINT_GOAL        = 5
+	TYPE_MACHINERY_UNPLACEABLE = 3
+	TYPE_BLUEPRINT_UNPLACEABLE = 4
+	TYPE_INTANGIBLE            = 5
 )
 
 var itemSchema ItemSchema
@@ -222,8 +222,7 @@ func checkValidProgress(pro Progress) error {
 		value, ok := itemTypeMap[pro.Blueprints[i].ItemID]
 		if ok {
 			if !(value == TYPE_BLUEPRINT_PLACEABLE ||
-				value == TYPE_BLUEPRINT_UNPLACEABLE ||
-				value == TYPE_BLUEPRINT_GOAL) {
+				value == TYPE_BLUEPRINT_UNPLACEABLE) {
 				return errors.New("Invalid ID in blueprint list")
 			}
 		} else {
