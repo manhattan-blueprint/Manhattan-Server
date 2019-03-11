@@ -59,6 +59,7 @@ With the database and configuration files setup and Docker installed, to build t
 The item schema JSON, found in `progress/serve/`, can be visualised as an item tree:
 
 (If not clear, the jpeg can be found `schemas/images/`)
+
 ![Item tree image has not loaded.](schemas/images/progression-tree.jpeg "Item tree")
 
 Where item types are:
