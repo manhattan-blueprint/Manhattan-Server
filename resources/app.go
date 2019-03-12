@@ -48,7 +48,7 @@ type LocationResReq struct {
 }
 
 const BEARER_PREFIX string = "Bearer "
-const MAX_ITEM_ID uint32 = 16
+const MAX_ITEM_ID uint32 = 32
 
 // Radius to return resources from, in kilometres
 const RESOURCE_RADIUS int = 1

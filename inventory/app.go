@@ -32,7 +32,7 @@ type ItemResponse struct {
 }
 
 const BEARER_PREFIX string = "Bearer "
-const MAX_ITEM_ID uint32 = 16
+const MAX_ITEM_ID uint32 = 32
 
 /* Initialise database connection, mux router and routes */
 func (a *App) Initialise(dbUser, dbPassword, dbHost, dbName string) error {

@@ -58,37 +58,57 @@ With the database and configuration files setup and Docker installed, to build t
 
 The item schema JSON, found in `progress/serve/`, can be visualised as an item tree:
 
-![Item tree image has not loaded.](schemas/images/item_tree.jpg "Item tree")
+(If not clear, the jpeg can be found in `schemas/images/`)
 
-Where item types match the item tree legend:
+![Item tree image has not loaded.](schemas/images/progression-tree.jpeg "Item tree")
+
+Where item types are:
 
 | Item type |                 Meaning                |
 |:---------:|:--------------------------------------:|
 |     1     |            Primary resource            |
 |     2     |  Crafted from blueprint and placeable  |
-|     3     | Crafted from blueprint and unplaceable |
-|     4     | Crafted from machinery and unplaceable |
-|     5     |    Crafted from blueprint and a goal   |
+|     3     | Crafted from machinery and unplaceable |
+|     4     | Crafted from blueprint and unplaceable |
+|     5     |               Intangible               |
+
+Though note, the communication beacon is not actually in the item schema, since it will be hardcoded into the desktop client.
 
 ### Quick Reference
 
 For quick item ID to item name reference:
 
-| Item ID |    Name    |
-|:-------:|:----------:|
-|    1    |    wood    |
-|    2    |    stone   |
-|    3    |    sand    |
-|    4    |  iron ore  |
-|    5    |    coal    |
-|    6    |   rubber   |
-|    7    |   furnace  |
-|    8    |    steel   |
-|    9    |    wheel   |
-|    10   |    chair   |
-|    11   |    glass   |
-|    12   |    wire    |
-|    13   |   welder   |
-|    14   |  generator |
-|    15   |    frame   |
-|    16   | dune buggy |
+| Item ID |          Name         |
+|:-------:|:---------------------:|
+|    1    |          Wood         |
+|    2    |         Stone         |
+|    3    |          Clay         |
+|    4    |        Iron ore       |
+|    5    |       Copper ore      |
+|    6    |         Rubber        |
+|    7    |        Diamond        |
+|    8    |          Sand         |
+|    9    |       Silica ore      |
+|    10   |         Quartz        |
+|    11   |        Furnace        |
+|    12   |        Charcoal       |
+|    13   |         Steel         |
+|    14   |         Copper        |
+|    15   |          Iron         |
+|    16   |         Glass         |
+|    17   |     Silicon wafer     |
+|    18   |       Fibreglass      |
+|    19   |      Machine base     |
+|    20   |      Wire drawer      |
+|    21   |    Uninsulated wire   |
+|    22   |     Insulated wire    |
+|    23   |      Copper coil      |
+|    24   |         Motor         |
+|    25   |      Solar panel      |
+|    26   |         Welder        |
+|    27   |  Satellite dish frame |
+|    28   |     Satellite dish    |
+|    29   |    Circuit printer    |
+|    30   | Printed circuit board |
+|    31   |  Transmitter receiver |
+|    32   |      Electricity      |

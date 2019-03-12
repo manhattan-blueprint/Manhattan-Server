@@ -164,7 +164,7 @@ func TestAddGetProgress(t *testing.T) {
 	clearProgressTable(t)
 
 	// Add blueprints to progress
-	payload := []byte(`{"blueprints":[{"item_id":7},{"item_id":9}]}`)
+	payload := []byte(`{"blueprints":[{"item_id":11},{"item_id":18}]}`)
 
 	req, err := http.NewRequest(http.MethodPost, "/api/v1/progress",
 		bytes.NewBuffer(payload))
@@ -197,7 +197,7 @@ func TestAddGetProgress(t *testing.T) {
 		t.Errorf("Expected two blueprints. Actual number was %d",
 			len(pro.Blueprints))
 	}
-	if pro.Blueprints[0].ItemID != 7 || pro.Blueprints[1].ItemID != 9 {
+	if pro.Blueprints[0].ItemID != 11 || pro.Blueprints[1].ItemID != 18 {
 		t.Errorf("Expected item IDs 1 and 9. Actual IDs were %d and %d",
 			pro.Blueprints[0].ItemID, pro.Blueprints[1].ItemID)
 	}
@@ -224,8 +224,8 @@ func TestAddEmptyProgress(t *testing.T) {
 func TestAddInvalidItemID(t *testing.T) {
 	clearProgressTable(t)
 
-	/* Item IDs must be greater than 0 and less than or equal 16 and correspond to
-	** a blueprint, i.e. item schema type of 2, 3 or 5 */
+	/* Item IDs must be greater than 0 and less than or equal 32 and correspond to
+	** a blueprint, i.e. item schema type of 2 or 4 */
 	payload := []byte(`{"blueprints":[{"item_id":0}]}`)
 
 	req, err := http.NewRequest(http.MethodPost, "/api/v1/progress",
@@ -238,7 +238,7 @@ func TestAddInvalidItemID(t *testing.T) {
 	res := executeRequest(req)
 	checkResponseCode(t, http.StatusBadRequest, res.Code)
 
-	payload = []byte(`{"blueprints":[{"item_id":17}]}`)
+	payload = []byte(`{"blueprints":[{"item_id":33}]}`)
 
 	req, err = http.NewRequest(http.MethodPost, "/api/v1/progress",
 		bytes.NewBuffer(payload))
@@ -264,33 +264,20 @@ func TestAddInvalidItemID(t *testing.T) {
 	checkResponseCode(t, http.StatusBadRequest, res.Code)
 
 	// Check type 2 is accepted
-	payload = []byte(`{"blueprints":[{"item_id":7}]}`)
-
-	req, err = http.NewRequest(http.MethodPost, "/api/v1/progress",
-		bytes.NewBuffer(payload))
-	req.Header.Set("Authorization", ACCESS_TOKEN)
-	if err != nil {
-		t.Errorf("Failed to create request")
-	}
-
-	res = executeRequest(req)
-	checkResponseCode(t, http.StatusOK, res.Code)
-
-	// Check type 3 is accepted
-	payload = []byte(`{"blueprints":[{"item_id":9}]}`)
-
-	req, err = http.NewRequest(http.MethodPost, "/api/v1/progress",
-		bytes.NewBuffer(payload))
-	req.Header.Set("Authorization", ACCESS_TOKEN)
-	if err != nil {
-		t.Errorf("Failed to create request")
-	}
-
-	res = executeRequest(req)
-	checkResponseCode(t, http.StatusOK, res.Code)
-
-	// Check type 4 is not accepted
 	payload = []byte(`{"blueprints":[{"item_id":11}]}`)
+
+	req, err = http.NewRequest(http.MethodPost, "/api/v1/progress",
+		bytes.NewBuffer(payload))
+	req.Header.Set("Authorization", ACCESS_TOKEN)
+	if err != nil {
+		t.Errorf("Failed to create request")
+	}
+
+	res = executeRequest(req)
+	checkResponseCode(t, http.StatusOK, res.Code)
+
+	// Check type 3 is not accepted
+	payload = []byte(`{"blueprints":[{"item_id":14}]}`)
 
 	req, err = http.NewRequest(http.MethodPost, "/api/v1/progress",
 		bytes.NewBuffer(payload))
@@ -302,8 +289,8 @@ func TestAddInvalidItemID(t *testing.T) {
 	res = executeRequest(req)
 	checkResponseCode(t, http.StatusBadRequest, res.Code)
 
-	// Check type 5 is accepted
-	payload = []byte(`{"blueprints":[{"item_id":16}]}`)
+	// Check type 4 is accepted
+	payload = []byte(`{"blueprints":[{"item_id":23}]}`)
 
 	req, err = http.NewRequest(http.MethodPost, "/api/v1/progress",
 		bytes.NewBuffer(payload))
@@ -315,8 +302,21 @@ func TestAddInvalidItemID(t *testing.T) {
 	res = executeRequest(req)
 	checkResponseCode(t, http.StatusOK, res.Code)
 
+	// Check type 5 is not accepted
+	payload = []byte(`{"blueprints":[{"item_id":32}]}`)
+
+	req, err = http.NewRequest(http.MethodPost, "/api/v1/progress",
+		bytes.NewBuffer(payload))
+	req.Header.Set("Authorization", ACCESS_TOKEN)
+	if err != nil {
+		t.Errorf("Failed to create request")
+	}
+
+	res = executeRequest(req)
+	checkResponseCode(t, http.StatusBadRequest, res.Code)
+
 	// Check blueprint list with both correct and incorrect item IDs is rejected
-	payload = []byte(`{"blueprints":[{"item_id":1}, {"item_id":10}]}`)
+	payload = []byte(`{"blueprints":[{"item_id":1}, {"item_id":31}]}`)
 
 	req, err = http.NewRequest(http.MethodPost, "/api/v1/progress",
 		bytes.NewBuffer(payload))

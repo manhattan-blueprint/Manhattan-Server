@@ -213,7 +213,7 @@ func TestAddEmptyInventory(t *testing.T) {
 func TestAddInvalidItemID(t *testing.T) {
 	clearInventoryTable(t)
 
-	// Item IDs must be greater than 0 and less than or equal 16
+	// Item IDs must be greater than 0 and less than or equal 32
 	payload := []byte(`{"items":[{"item_id":0,"quantity":4}]}`)
 
 	req, err := http.NewRequest(http.MethodPost, "/api/v1/inventory",
@@ -226,7 +226,7 @@ func TestAddInvalidItemID(t *testing.T) {
 	res := executeRequest(req)
 	checkResponseCode(t, http.StatusBadRequest, res.Code)
 
-	payload = []byte(`{"items":[{"item_id":17,"quantity":4}]}`)
+	payload = []byte(`{"items":[{"item_id":33,"quantity":4}]}`)
 
 	req, err = http.NewRequest(http.MethodPost, "/api/v1/inventory",
 		bytes.NewBuffer(payload))
