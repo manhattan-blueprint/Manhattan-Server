@@ -445,7 +445,7 @@ func TestAddRemoveEmptyResources(t *testing.T) {
 func TestAddRemoveInvalidItemID(t *testing.T) {
 	clearResourcesTable(t)
 
-	payload := []byte(`{"spawns":[{"item_id":17,"location":{"latitude":51.456061,"longitude":-2.603104},"quantity":3}]}`)
+	payload := []byte(`{"spawns":[{"item_id":33,"location":{"latitude":51.456061,"longitude":-2.603104},"quantity":3}]}`)
 
 	// Add
 	req, err := http.NewRequest(http.MethodPost, "/api/v1/resources",
