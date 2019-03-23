@@ -55,11 +55,16 @@ type SchemaItem struct {
 	Blueprint []SchemaBlueprintRecipe `json:"blueprint"`
 	MachineID uint32                  `json:"machine_id"`
 	Recipe    []SchemaBlueprintRecipe `json:"recipe`
+	Fuel      []SchemaFuel            `json:"fuel"`
 }
 
 type SchemaBlueprintRecipe struct {
 	ItemID   uint32 `json:"item_id"`
 	Quantity uint32 `json:"quantity"`
+}
+
+type SchemaFuel struct {
+	ItemID uint32 `json:"item_id"`
 }
 
 const BEARER_PREFIX string = "Bearer "
