@@ -5,6 +5,7 @@ import (
 	"encoding/json"
 	"errors"
 	"fmt"
+	"io/ioutil"
 	"net/http"
 	"os"
 	"strconv"
@@ -364,22 +365,46 @@ func (a *App) getItemSchema(w http.ResponseWriter, r *http.Request) {
 
 /* Add player desktop state as a JSON */
 func (a *App) addDesktopState(w http.ResponseWriter, r *http.Request) {
-	_, err := getIDFromToken(a.DB, r)
+	id, err := getIDFromToken(a.DB, r)
 	if err != nil {
 		respondWithError(w, http.StatusUnauthorized, err.Error())
 		return
 	}
 
-	respondWithError(w, http.StatusNotImplemented, "Not yet implemented")
+	// Read body into byte array
+	body, err := ioutil.ReadAll(r.Body)
+	if err != nil {
+		respondWithError(w, http.StatusInternalServerError, err.Error())
+	}
+
+	// TODO: Make this feel less naughty
+	var deskState DesktopState
+	deskState.UserID = id
+	deskState.GameState = string(body)
+
+	// Query database
+	err = deskState.AddState(a.DB)
+	if err != nil {
+		respondWithError(w, http.StatusInternalServerError, err.Error())
+		return
+	}
+
+	respondWithEmptyJSON(w, http.StatusOK)
 }
 
 /* Get player desktop state as a JSON */
 func (a *App) getDesktopState(w http.ResponseWriter, r *http.Request) {
-	_, err := getIDFromToken(a.DB, r)
+	id, err := getIDFromToken(a.DB, r)
 	if err != nil {
 		respondWithError(w, http.StatusUnauthorized, err.Error())
 		return
 	}
 
-	respondWithError(w, http.StatusNotImplemented, "Not yet implemented")
+	stmt := "SELECT state FROM desktop WHERE user_id=?"
+	var body []byte
+	err = a.DB.QueryRow(stmt, id).Scan(&body)
+
+	w.Header().Set("Content-Type", "application/json")
+	w.WriteHeader(http.StatusOK)
+	w.Write(body)
 }

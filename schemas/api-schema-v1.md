@@ -348,6 +348,12 @@ item_id  | Int | The blueprint item_id to add (1 - 16 inclusive)
 `progress/desktop-state` (POST) <br>
 **Description**: Add desktop state JSON
 
+**Request Contents**:
+
+Parameter | Type | Description
+---|---|---
+game_state | String | Game state objects in a JSON string
+
 **Response**: <br>
 ```json
 {}

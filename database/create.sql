@@ -48,7 +48,7 @@ CREATE TABLE progress (
 
 CREATE TABLE desktop (
     user_id INT UNSIGNED,
-    state JSON NOT NULL,
+    state TEXT NOT NULL,
     FOREIGN KEY (user_id) REFERENCES account(user_id),
     PRIMARY KEY (user_id)
 );
