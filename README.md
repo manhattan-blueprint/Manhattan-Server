@@ -64,15 +64,15 @@ The item schema JSON, found in `progress/serve/`, can be visualised as an item t
 
 Where item types are:
 
-| Item type |                 Meaning                |
-|:---------:|:--------------------------------------:|
-|     1     |            Primary resource            |
-|     2     |  Crafted from blueprint and placeable  |
-|     3     | Crafted from machinery and unplaceable |
-|     4     | Crafted from blueprint and unplaceable |
-|     5     |               Intangible               |
+| Item type |                  Meaning                  |
+|:---------:|:-----------------------------------------:|
+|     1     | Primary resource                          |
+|     2     | Machine crafted from blueprint            |
+|     3     | Material/component crafted from machinery |
+|     4     | Component crafted from blueprint          |
+|     5     | Intangible                                |
 
-Though note, the communication beacon is not actually in the item schema, since it will be hardcoded into the desktop client.
+Though note, the communication beacon is not actually in the item schema, since it will be hardcoded into the desktop client. Also, currently all items aside from intangibles are placeable.
 
 ### Quick Reference
 
