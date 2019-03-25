@@ -44,12 +44,17 @@ func TestMain(m *testing.M) {
 		log.Fatal(err)
 	}
 
+	err = checkDesktopTableExistsEmpty()
+	if err != nil {
+		log.Fatal(err)
+	}
+
 	code := m.Run()
 
 	os.Exit(code)
 }
 
-// Check the inventory table exists and is empty
+/* Check the progress table exists and is empty */
 func checkProgressTableExistsEmpty() error {
 
 	// Check progress table
@@ -65,10 +70,33 @@ func checkProgressTableExistsEmpty() error {
 	return nil
 }
 
+/* Check the desktop table exists and is empty */
+func checkDesktopTableExistsEmpty() error {
+
+	// Check desktop table
+	var stateCount Count
+	stateStmt := "SELECT COUNT(*) FROM desktop"
+	stateCount.Value = 1
+	err := testA.DB.QueryRow(stateStmt).Scan(&stateCount.Value)
+	if err != nil {
+		return err
+	} else if stateCount.Value != 0 {
+		return errors.New("Desktop table is not empty")
+	}
+	return nil
+}
+
 func clearProgressTable(t *testing.T) {
 	_, err := testA.DB.Exec("DELETE FROM progress")
 	if err != nil {
 		t.Errorf("Failed to clear progress table")
+	}
+}
+
+func clearDesktopTable(t *testing.T) {
+	_, err := testA.DB.Exec("DELETE FROM desktop")
+	if err != nil {
+		t.Errorf("Failed to clear desktop table")
 	}
 }
 
@@ -340,4 +368,34 @@ func TestGetItemSchema(t *testing.T) {
 	checkResponseCode(t, http.StatusOK, res.Code)
 
 	/* TODO: This really should check the returned JSON matches the item schema file */
+}
+
+/* Check correct desktop state is added and returned */
+func TestAddGetDesktopState(t *testing.T) {
+	clearDesktopTable(t)
+
+	payload := []byte(`{"mapState":{"grid":[{"Key":{"x":-2.0,"y":5.0},"Value":{"id":1,"input":[],"output":[]}}]},"heldItemState":{"indexOfHeldItem":0},"inventoryState":{"inventoryContents":[{"Key":1,"Value":[{"hexID":0,"quantity":1}]}],"inventorySize":24}}`)
+
+	req, err := http.NewRequest(http.MethodPost, "/api/v1/progress/desktop-state",
+		bytes.NewBuffer(payload))
+	req.Header.Set("Authorization", ACCESS_TOKEN)
+	if err != nil {
+		t.Errorf("Failed to create request")
+	}
+
+	res := executeRequest(req)
+	checkResponseCode(t, http.StatusOK, res.Code)
+
+	req, err = http.NewRequest(http.MethodGet, "/api/v1/progress/desktop-state", nil)
+	req.Header.Set("Authorization", ACCESS_TOKEN)
+	if err != nil {
+		t.Errorf("Failed to create request")
+	}
+
+	res = executeRequest(req)
+	checkResponseCode(t, http.StatusOK, res.Code)
+
+	if !bytes.Equal(res.Body.Bytes(), payload) {
+		t.Errorf("JSON returned does not match the JSON added")
+	}
 }

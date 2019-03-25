@@ -350,9 +350,7 @@ item_id  | Int | The blueprint item_id to add (1 - 16 inclusive)
 
 **Request Contents**:
 
-Parameter | Type | Description
----|---|---
-game_state | String | Game state objects in a JSON string
+JSON object representing desktop state.
 
 **Response**: <br>
 ```json
@@ -366,6 +364,6 @@ game_state | String | Game state objects in a JSON string
 **Response**: <br>
 ```json
 {
-    "game_state":"..."
+    "mapState":"..."
 }
 ```

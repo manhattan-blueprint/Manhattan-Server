@@ -166,6 +166,13 @@ func respondWithEmptyJSON(w http.ResponseWriter, code int) {
 	w.Write(response)
 }
 
+/* Respond with a raw byte array */
+func respondWithRaw(w http.ResponseWriter, code int, body []byte) {
+	w.Header().Set("Content-Type", "application/json")
+	w.WriteHeader(code)
+	w.Write(body)
+}
+
 /* Validate auth token and get user ID */
 func getIDFromToken(db *sql.DB, r *http.Request) (uint32, error) {
 	var id ID
@@ -377,7 +384,6 @@ func (a *App) addDesktopState(w http.ResponseWriter, r *http.Request) {
 		respondWithError(w, http.StatusInternalServerError, err.Error())
 	}
 
-	// TODO: Make this feel less naughty
 	var deskState DesktopState
 	deskState.UserID = id
 	deskState.GameState = string(body)
@@ -402,9 +408,11 @@ func (a *App) getDesktopState(w http.ResponseWriter, r *http.Request) {
 
 	stmt := "SELECT state FROM desktop WHERE user_id=?"
 	var body []byte
+	body = make([]byte, 0)
 	err = a.DB.QueryRow(stmt, id).Scan(&body)
+	if err != nil {
+		respondWithError(w, http.StatusInternalServerError, err.Error())
+	}
 
-	w.Header().Set("Content-Type", "application/json")
-	w.WriteHeader(http.StatusOK)
-	w.Write(body)
+	respondWithRaw(w, http.StatusOK, body)
 }
