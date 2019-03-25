@@ -55,7 +55,7 @@ type SchemaItem struct {
 	Type      uint32                  `json:"type"`
 	Blueprint []SchemaBlueprintRecipe `json:"blueprint"`
 	MachineID uint32                  `json:"machine_id"`
-	Recipe    []SchemaBlueprintRecipe `json:"recipe`
+	Recipe    []SchemaBlueprintRecipe `json:"recipe"`
 }
 
 type SchemaBlueprintRecipe struct {
