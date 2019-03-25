@@ -343,3 +343,27 @@ item_id  | Int | The blueprint item_id to add (1 - 16 inclusive)
     ]
 }
 ```
+
+---
+`progress/desktop-state` (POST) <br>
+**Description**: Add desktop state JSON
+
+**Request Contents**:
+
+JSON object representing desktop state.
+
+**Response**: <br>
+```json
+{}
+```
+
+---
+`progress/desktop-state` (GET) <br>
+**Description**: Get desktop state JSON
+
+**Response**: <br>
+```json
+{
+    "mapState":"..."
+}
+```

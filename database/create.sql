@@ -45,3 +45,10 @@ CREATE TABLE progress (
     FOREIGN KEY (user_id) REFERENCES account(user_id),
     PRIMARY KEY (user_id, item_id)
 );
+
+CREATE TABLE desktop (
+    user_id INT UNSIGNED,
+    state TEXT NOT NULL,
+    FOREIGN KEY (user_id) REFERENCES account(user_id),
+    PRIMARY KEY (user_id)
+);

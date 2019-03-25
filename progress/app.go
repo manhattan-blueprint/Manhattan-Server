@@ -5,6 +5,7 @@ import (
 	"encoding/json"
 	"errors"
 	"fmt"
+	"io/ioutil"
 	"net/http"
 	"os"
 	"strconv"
@@ -54,7 +55,7 @@ type SchemaItem struct {
 	Type      uint32                  `json:"type"`
 	Blueprint []SchemaBlueprintRecipe `json:"blueprint"`
 	MachineID uint32                  `json:"machine_id"`
-	Recipe    []SchemaBlueprintRecipe `json:"recipe`
+	Recipe    []SchemaBlueprintRecipe `json:"recipe"`
 	Fuel      []SchemaFuel            `json:"fuel"`
 }
 
@@ -137,6 +138,10 @@ func (a *App) initialiseRoutes() {
 		a.addProgress).Methods(http.MethodPost)
 	a.Router.HandleFunc(fmt.Sprintf("%s/progress/leaderboard", prefix),
 		a.getLeaderboard).Methods(http.MethodGet)
+	a.Router.HandleFunc(fmt.Sprintf("%s/progress/desktop-state", prefix),
+		a.addDesktopState).Methods(http.MethodPost)
+	a.Router.HandleFunc(fmt.Sprintf("%s/progress/desktop-state", prefix),
+		a.getDesktopState).Methods(http.MethodGet)
 	// Serve item schema
 	a.Router.HandleFunc(fmt.Sprintf("%s/item-schema", prefix),
 		a.getItemSchema).Methods(http.MethodGet)
@@ -164,6 +169,13 @@ func respondWithEmptyJSON(w http.ResponseWriter, code int) {
 	w.Header().Set("Content-Type", "application/json")
 	w.WriteHeader(code)
 	w.Write(response)
+}
+
+/* Respond with a raw byte array */
+func respondWithRaw(w http.ResponseWriter, code int, body []byte) {
+	w.Header().Set("Content-Type", "application/json")
+	w.WriteHeader(code)
+	w.Write(body)
 }
 
 /* Validate auth token and get user ID */
@@ -361,4 +373,51 @@ func (a *App) getLeaderboard(w http.ResponseWriter, r *http.Request) {
 /* Return item schema */
 func (a *App) getItemSchema(w http.ResponseWriter, r *http.Request) {
 	respondWithJSON(w, http.StatusOK, itemSchema)
+}
+
+/* Add player desktop state as a JSON */
+func (a *App) addDesktopState(w http.ResponseWriter, r *http.Request) {
+	id, err := getIDFromToken(a.DB, r)
+	if err != nil {
+		respondWithError(w, http.StatusUnauthorized, err.Error())
+		return
+	}
+
+	// Read body into byte array
+	body, err := ioutil.ReadAll(r.Body)
+	if err != nil {
+		respondWithError(w, http.StatusInternalServerError, err.Error())
+	}
+
+	var deskState DesktopState
+	deskState.UserID = id
+	deskState.GameState = string(body)
+
+	// Query database
+	err = deskState.AddState(a.DB)
+	if err != nil {
+		respondWithError(w, http.StatusInternalServerError, err.Error())
+		return
+	}
+
+	respondWithEmptyJSON(w, http.StatusOK)
+}
+
+/* Get player desktop state as a JSON */
+func (a *App) getDesktopState(w http.ResponseWriter, r *http.Request) {
+	id, err := getIDFromToken(a.DB, r)
+	if err != nil {
+		respondWithError(w, http.StatusUnauthorized, err.Error())
+		return
+	}
+
+	stmt := "SELECT state FROM desktop WHERE user_id=?"
+	var body []byte
+	body = make([]byte, 0)
+	err = a.DB.QueryRow(stmt, id).Scan(&body)
+	if err != nil {
+		respondWithError(w, http.StatusInternalServerError, err.Error())
+	}
+
+	respondWithRaw(w, http.StatusOK, body)
 }
