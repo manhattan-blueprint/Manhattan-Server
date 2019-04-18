@@ -416,7 +416,13 @@ func (a *App) getDesktopState(w http.ResponseWriter, r *http.Request) {
 	body = make([]byte, 0)
 	err = a.DB.QueryRow(stmt, id).Scan(&body)
 	if err != nil {
-		respondWithError(w, http.StatusInternalServerError, err.Error())
+		switch err {
+		case sql.ErrNoRows:
+			respondWithEmptyJSON(w, http.StatusOK)
+		default:
+			respondWithError(w, http.StatusInternalServerError, err.Error())
+		}
+		return
 	}
 
 	respondWithRaw(w, http.StatusOK, body)

@@ -399,3 +399,23 @@ func TestAddGetDesktopState(t *testing.T) {
 		t.Errorf("JSON returned does not match the JSON added")
 	}
 }
+
+/* Check empty JSON is returned if no desktop state exists */
+func TestGetEmptyDesktopState(t *testing.T) {
+	clearDesktopTable(t)
+
+	req, err := http.NewRequest(http.MethodGet, "/api/v1/progress/desktop-state", nil)
+	req.Header.Set("Authorization", ACCESS_TOKEN)
+	if err != nil {
+		t.Errorf("Failed to create request")
+	}
+
+	res := executeRequest(req)
+	checkResponseCode(t, http.StatusOK, res.Code)
+
+	expectedPayload := []byte(`{}`)
+
+	if !bytes.Equal(res.Body.Bytes(), expectedPayload) {
+		t.Errorf("JSON returned is non-empty")
+	}
+}
