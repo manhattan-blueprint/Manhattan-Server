@@ -327,7 +327,7 @@
     {
       "item_id":25,
       "name":"Solar panel",
-      "type":2,
+      "type":4,
       "blueprint":[
         {
           "item_id":16,
