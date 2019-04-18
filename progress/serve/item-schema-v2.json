@@ -241,10 +241,6 @@
       "type":2,
       "blueprint":[
         {
-          "item_id":11,
-          "quantity":1
-        },
-        {
           "item_id":13,
           "quantity":2
         },
@@ -281,7 +277,7 @@
     {
       "item_id":22,
       "name":"Insulated wire",
-      "type":2,
+      "type":4,
       "blueprint":[
         {
           "item_id":6,
@@ -331,7 +327,7 @@
     {
       "item_id":25,
       "name":"Solar panel",
-      "type":2,
+      "type":4,
       "blueprint":[
         {
           "item_id":16,
